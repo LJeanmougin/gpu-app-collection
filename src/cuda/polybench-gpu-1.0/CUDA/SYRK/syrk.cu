@@ -150,7 +150,7 @@ void syrkCuda(DATA_TYPE* A, DATA_TYPE* C, DATA_TYPE* C_outputFromGpu)
 	dim3 block(DIM_THREAD_BLOCK_X, DIM_THREAD_BLOCK_Y);
 	dim3 grid((size_t)(ceil(((float)N) / ((float)DIM_THREAD_BLOCK_X))), (size_t)ceil(((float)N) / ((float)DIM_THREAD_BLOCK_Y)));
 	t_start = rtclock();
-	syrk_kernel<<<grid,block>>>(alpha, beta, A_gpu,C_gpu);
+	syrk_kernel<<<1,block>>>(alpha, beta, A_gpu,C_gpu);
 	cudaThreadSynchronize();
 	t_end = rtclock();
 	fprintf(stdout, "GPU Runtime: %0.6lfs\n", t_end - t_start);

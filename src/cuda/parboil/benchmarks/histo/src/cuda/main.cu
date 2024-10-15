@@ -156,8 +156,8 @@ int main(int argc, char* argv[]) {
     cudaMemcpy(ranges,ranges_h, 2*sizeof(unsigned int), cudaMemcpyHostToDevice);
     
     pb_SwitchToSubTimer(&timers, prescans , pb_TimerID_KERNEL);
-
-    histo_prescan_kernel<<<dim3(PRESCAN_BLOCKS_X),dim3(PRESCAN_THREADS)>>>((unsigned int*)input, img_height*img_width, ranges);
+    // L.Jeanmougin : reducing to 1 block
+    histo_prescan_kernel<<<1,dim3(PRESCAN_THREADS)>>>((unsigned int*)input, img_height*img_width, ranges);
     
     pb_SwitchToSubTimer(&timers, postpremems , pb_TimerID_KERNEL);
 
@@ -167,7 +167,8 @@ int main(int argc, char* argv[]) {
     
     pb_SwitchToSubTimer(&timers, intermediates, pb_TimerID_KERNEL);
 
-    histo_intermediates_kernel<<<dim3((img_height + UNROLL-1)/UNROLL), dim3((img_width+1)/2)>>>(
+    // L.Jeanmougin : reducing to 1 block
+    histo_intermediates_kernel<<<1, dim3((img_width+1)/2)>>>(
                 (uint2*)(input),
                 (unsigned int)img_height,
                 (unsigned int)img_width,
@@ -178,7 +179,8 @@ int main(int argc, char* argv[]) {
     pb_SwitchToSubTimer(&timers, mains, pb_TimerID_KERNEL);
     
     
-    histo_main_kernel<<<dim3(BLOCK_X, ranges_h[1]-ranges_h[0]+1), dim3(THREADS)>>>(
+    // L.Jeanmougin : reducing to 1 block
+    histo_main_kernel<<<1, dim3(THREADS)>>>(
                 (uchar4*)(sm_mappings),
                 img_height*img_width,
                 ranges_h[0], ranges_h[1],
@@ -190,7 +192,8 @@ int main(int argc, char* argv[]) {
     
     pb_SwitchToSubTimer(&timers, finals, pb_TimerID_KERNEL);
     
-    histo_final_kernel<<<dim3(BLOCK_X*3), dim3(512)>>>(
+    // L.Jeanmougin : reducing to 1 block
+    histo_final_kernel<<<1, dim3(512)>>>(
                 ranges_h[0], ranges_h[1],
                 histo_height, histo_width,
                 (unsigned int*)(global_subhisto),
@@ -198,6 +201,7 @@ int main(int argc, char* argv[]) {
                 (unsigned int*)(global_overflow),
                 (unsigned int*)(final_histo)
     );
+    break; // L.Jeanmougin : REMOVE WHEN FUNCTIONNAL
   }
   pb_SwitchToTimer(&timers, pb_TimerID_IO);
 

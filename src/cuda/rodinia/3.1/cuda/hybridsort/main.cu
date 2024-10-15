@@ -218,7 +218,7 @@ void cudaSort(float *origList, float minimum, float maximum,
 
 	// Download result
 	sdkStartTimer(&downloadTimer); 
-		checkCudaErrors(	cudaMemcpy((void *) resultList, 
+		(	cudaMemcpy((void *) resultList, 
 				(void *)mergeresult, numElements * sizeof(float), cudaMemcpyDeviceToHost) );
 	sdkStopTimer(&downloadTimer); 
 

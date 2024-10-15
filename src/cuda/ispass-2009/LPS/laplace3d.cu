@@ -170,7 +170,7 @@ int main(int argc, char **argv){
   CUT_SAFE_CALL( cutStartTimer(hTimer) );
 
   for (i = 1; i <= REPEAT; ++i) {
-    GPU_laplace3d<<<dimGrid, dimBlock>>>(NX, NY, NZ, pitch, d_u1, d_u2);
+    GPU_laplace3d<<<1, dimBlock>>>(NX, NY, NZ, pitch, d_u1, d_u2);
     d_foo = d_u1; d_u1 = d_u2; d_u2 = d_foo;   // swap d_u1 and d_u3
 
     CUDA_SAFE_CALL( cudaThreadSynchronize() );

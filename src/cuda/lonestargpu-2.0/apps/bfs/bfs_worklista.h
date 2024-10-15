@@ -178,7 +178,7 @@ void bfs(Graph &graph, foru *dist)
 	FACTOR = (NVERTICES + MAXBLOCKSIZE * NBLOCKS - 1) / (MAXBLOCKSIZE * NBLOCKS);
 
 	printf("initializing (nblocks=%d, blocksize=%d).\n", NBLOCKS*FACTOR, MAXBLOCKSIZE);
-	initialize <<<NBLOCKS*FACTOR, MAXBLOCKSIZE>>> (dist, graph.nnodes);
+	initialize <<<1, MAXBLOCKSIZE>>> (dist, graph.nnodes);
 	CudaTest("initializing failed");
 	cudaMemcpy(&dist[0], &foruzero, sizeof(foruzero), cudaMemcpyHostToDevice);
 
@@ -218,7 +218,7 @@ void bfs(Graph &graph, foru *dist)
 		//display_items(active, graph.nnodes);
 		//printf("%d %d\n", iteration, get_count(active, graph.nnodes));
 
-		drelax <<<nblocks, BLKSIZE>>> (dist, graph, nerr, d_active1, d_active2);
+		drelax <<<1, BLKSIZE>>> (dist, graph, nerr, d_active1, d_active2);
 
 		bool *tmp1;
 		tmp1 = d_active1;
@@ -230,6 +230,7 @@ void bfs(Graph &graph, foru *dist)
 		//outwlptr->printHost();
 		CUDA_SAFE_CALL(cudaMemcpy(&hnerr, nerr, sizeof(hnerr), cudaMemcpyDeviceToHost));
 		//wlsz = outwlptr->getSize();
+		break;
 	} while (hnerr); // hnerr is actually not_done
 	CUDA_SAFE_CALL(cudaDeviceSynchronize());
 	endtime = rtclock();

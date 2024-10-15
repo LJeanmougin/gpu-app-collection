@@ -279,8 +279,8 @@ void run(int argc, char** argv)
     int borderRows = (pyramid_height)*EXPAND_RATE/2;
     int smallBlockCol = BLOCK_SIZE-(pyramid_height)*EXPAND_RATE;
     int smallBlockRow = BLOCK_SIZE-(pyramid_height)*EXPAND_RATE;
-    int blockCols = grid_cols/smallBlockCol+((grid_cols%smallBlockCol==0)?0:1);
-    int blockRows = grid_rows/smallBlockRow+((grid_rows%smallBlockRow==0)?0:1);
+    int blockCols = 1; // CHANGING SO NUMBER OF BLOCKS IS 1 ----------- grid_cols/smallBlockCol+((grid_cols%smallBlockCol==0)?0:1);
+    int blockRows = 1; // CHANGING SO NUMBER OF BLOCKS IS 1 -----------  grid_rows/smallBlockRow+((grid_rows%smallBlockRow==0)?0:1);
 
     FilesavingTemp = (float *) malloc(size*sizeof(float));
     FilesavingPower = (float *) malloc(size*sizeof(float));

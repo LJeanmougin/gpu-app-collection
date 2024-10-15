@@ -63,6 +63,7 @@ __global__ void euclid(LatLong *d_locations, float *d_distances, int numRecords,
 
 int main(int argc, char* argv[])
 {
+	 
 	int    i=0;
 	float lat, lng;
 	int quiet=0,timing=0,platform=0,device=0;
@@ -152,7 +153,7 @@ int main(int argc, char* argv[])
     /**
     * Execute kernel
     */
-    euclid<<< gridDim, threadsPerBlock >>>(d_locations,d_distances,numRecords,lat,lng);
+    euclid<<< 1, threadsPerBlock >>>(d_locations,d_distances,numRecords,lat,lng);
     cudaThreadSynchronize();
 
     //Copy data from device memory to host memory

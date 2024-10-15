@@ -288,7 +288,8 @@ int main(int argc, char *argv []){
 	// 	SCALE IMAGE DOWN FROM 0-255 TO 0-1 AND EXTRACT
 	//================================================================================80
 
-	extract<<<blocks, threads>>>(	Ne,
+		// CHANGING NUMBER OF BLOCKS TO 1
+	extract<<<1, threads>>>(	Ne,
 									d_I);
 
 	checkCUDAError("extract");
@@ -308,7 +309,8 @@ int main(int argc, char *argv []){
 	// fflush(NULL);
 
 		// execute square kernel
-		prepare<<<blocks, threads>>>(	Ne,
+		// CHANGING NUMBER OF BLOCKS TO 1
+		prepare<<<1, threads>>>(	Ne,
 										d_I,
 										d_sums,
 										d_sums2);
@@ -326,7 +328,8 @@ int main(int argc, char *argv []){
 			checkCUDAError("before reduce");
 
 			// run kernel
-			reduce<<<blocks2, threads>>>(	Ne,
+		// CHANGING NUMBER OF BLOCKS TO 1
+			reduce<<<1, threads>>>(	Ne,
 											no,
 											mul,
 											d_sums, 
@@ -369,7 +372,8 @@ int main(int argc, char *argv []){
 		q0sqr = varROI / meanROI2;											// gets standard deviation of ROI
 
 		// execute srad kernel
-		srad<<<blocks, threads>>>(	lambda,									// SRAD coefficient 
+		// CHANGING NUMBER OF BLOCKS TO 1
+		srad<<<1, threads>>>(	lambda,									// SRAD coefficient 
 									Nr,										// # of rows in input image
 									Nc,										// # of columns in input image
 									Ne,										// # of elements in input image
@@ -388,7 +392,7 @@ int main(int argc, char *argv []){
 		checkCUDAError("srad");
 
 		// execute srad2 kernel
-		srad2<<<blocks, threads>>>(	lambda,									// SRAD coefficient 
+		srad2<<<1, threads>>>(	lambda,									// SRAD coefficient 
 									Nr,										// # of rows in input image
 									Nc,										// # of columns in input image
 									Ne,										// # of elements in input image
@@ -415,7 +419,7 @@ int main(int argc, char *argv []){
 	// 	SCALE IMAGE UP FROM 0-1 TO 0-255 AND COMPRESS
 	//================================================================================80
 
-	compress<<<blocks, threads>>>(	Ne,
+	compress<<<1, threads>>>(	Ne,
 									d_I);
 
 	checkCUDAError("compress");

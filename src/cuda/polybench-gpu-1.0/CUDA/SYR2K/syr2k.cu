@@ -153,7 +153,7 @@ void syr2kCuda(DATA_TYPE* A, DATA_TYPE* B, DATA_TYPE* C, DATA_TYPE* C_outputFrom
 	dim3 grid((size_t)ceil( ((float)N) / ((float)DIM_THREAD_BLOCK_X) ), (size_t)(ceil( ((float)N) / ((float)DIM_THREAD_BLOCK_Y) )));
 	
 	t_start = rtclock();
-	syr2k_kernel<<<grid,block>>>(A_gpu,B_gpu,C_gpu);
+	syr2k_kernel<<<1,block>>>(A_gpu,B_gpu,C_gpu);
 	cudaThreadSynchronize();
 	t_end = rtclock();
 	fprintf(stdout, "GPU Runtime: %0.6lfs\n", t_end - t_start);

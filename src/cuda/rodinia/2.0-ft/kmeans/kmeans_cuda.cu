@@ -71,7 +71,8 @@ void allocateMemory(int npoints, int nfeatures, int nclusters, float **features)
 	cudaMalloc((void**) &feature_d, npoints*nfeatures*sizeof(float));
 		
 	/* invert the data array (kernel execution) */	
-	invert_mapping<<<num_blocks,num_threads>>>(feature_flipped_d,feature_d,npoints,nfeatures);
+	// CHANGING BLOCK COUNT TO 1
+	invert_mapping<<<1,num_threads>>>(feature_flipped_d,feature_d,npoints,nfeatures);
 		
 	/* allocate memory for membership_d[] and clusters_d[][] (device) */
 	cudaMalloc((void**) &membership_d, npoints*sizeof(int));
@@ -200,7 +201,8 @@ kmeansCuda(float  **feature,				/* in: [npoints][nfeatures] */
     dim3  threads( num_threads_perdim*num_threads_perdim );
     
 	/* execute the kernel */
-    kmeansPoint<<< grid, threads >>>( feature_d,
+	// CHANGING NUM BLOCK TO 1
+    kmeansPoint<<< 1, threads >>>( feature_d,
                                       nfeatures,
                                       npoints,
                                       nclusters,

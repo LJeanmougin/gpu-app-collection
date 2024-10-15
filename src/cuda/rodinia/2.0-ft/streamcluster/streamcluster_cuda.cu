@@ -208,7 +208,8 @@ float pgain( long x, Points *points, float z, long int *numcenters, int kmax, bo
 #ifdef PROFILE
 	double t9 = gettime();
 #endif
-	pgain_kernel<<< grid_size, THREADS_PER_BLOCK,  smSize>>>(	
+		// CHANGING NUMBER OF BLOCKS TO 1
+	pgain_kernel<<< 1, THREADS_PER_BLOCK,  smSize>>>(	
 																											num,								// in:	# of data
 																											dim,									// in:	dimension of point coordinates
 																											x,										// in:	point to open a center at

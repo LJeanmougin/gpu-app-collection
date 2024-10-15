@@ -135,7 +135,7 @@ int main(int argc, char** argv) {
 	for (int i=0; i<50; i++)
 	{
 		cudaBindTexture(0, tex_x_float, d_x_vector);
-		spmv_jds_texture<<<grid, block>>>(d_Ax_vector,
+		spmv_jds_texture<<<1, block>>>(d_Ax_vector,
 										 d_data,d_indices,d_perm,
 										 d_x_vector,d_nzcnt,dim);
 		cudaUnbindTexture(tex_x_float);	

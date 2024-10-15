@@ -233,11 +233,11 @@ void sort (int numElems, unsigned int max_value, unsigned int* &dkeys, unsigned 
   cudaMalloc((void**)&dvalues_o, numElems*sizeof(unsigned int));
 
   for (int i=0; i<iterations; i++){
-    splitSort<<<grid,block>>>(numElems, i, dkeys, dvalues, dhisto);
+    splitSort<<<1,block>>>(numElems, i, dkeys, dvalues, dhisto);
 
     scanLargeArray(grid.x*(1<<BITS), dhisto);
 
-    splitRearrange<<<grid,block>>>(numElems, i, dkeys, dkeys_o, dvalues, dvalues_o, dhisto);
+    splitRearrange<<<1,block>>>(numElems, i, dkeys, dkeys_o, dvalues, dvalues_o, dhisto);
 
     unsigned int* temp = dkeys;
     dkeys = dkeys_o;

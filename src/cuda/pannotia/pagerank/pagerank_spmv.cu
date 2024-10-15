@@ -192,7 +192,7 @@ int main(int argc, char **argv)
     double timer3 = gettime();
 
     // Launch the initialization kernel
-    inibuffer <<<grid, threads>>>(pagerank1_d, pagerank2_d, num_nodes);
+    inibuffer <<<1, threads>>>(pagerank1_d, pagerank2_d, num_nodes);
     cudaThreadSynchronize();
     err = cudaGetLastError();
     if (err != cudaSuccess) {
@@ -201,7 +201,7 @@ int main(int argc, char **argv)
     }
 
     // Initialize the CSR
-    inicsr <<<grid, threads>>>(row_d, col_d, data_d, col_cnt_d, num_nodes,
+    inicsr <<<1, threads>>>(row_d, col_d, data_d, col_cnt_d, num_nodes,
                                num_edges);
     cudaThreadSynchronize();
     err = cudaGetLastError();
@@ -213,12 +213,12 @@ int main(int argc, char **argv)
     // Run PageRank for some iter. TO: convergence determination
     for (int i = 0; i < ITER; i++) {
         // Launch pagerank kernel 1
-        spmv_csr_scalar_kernel <<<grid, threads>>>(num_nodes, row_d, col_d,
+        spmv_csr_scalar_kernel <<<1, threads>>>(num_nodes, row_d, col_d,
                                                    data_d, pagerank1_d,
                                                    pagerank2_d);
 
         // Launch pagerank kernel 2
-        pagerank2 <<<grid, threads>>>(pagerank1_d, pagerank2_d, num_nodes);
+        pagerank2 <<<1, threads>>>(pagerank1_d, pagerank2_d, num_nodes);
     }
     cudaThreadSynchronize();
 

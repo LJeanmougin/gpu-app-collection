@@ -74,7 +74,7 @@ void bfs(Graph &graph, foru *dist)
 	kconf.setMaxThreadsPerBlock();
 	printf("initializing.\n");
 	assert(kconf.coversProblem(0));
-	initialize <<<kconf.getNumberOfBlocks(), kconf.getNumberOfBlockThreads()>>> (dist, graph.nnodes);
+	initialize <<<1, kconf.getNumberOfBlockThreads()>>> (dist, graph.nnodes);
 	CudaTest("initializing failed");
 
 	cudaMemcpy(&dist[0], &foruzero, sizeof(foruzero), cudaMemcpyHostToDevice);
@@ -90,10 +90,11 @@ void bfs(Graph &graph, foru *dist)
 
 		CUDA_SAFE_CALL(cudaMemcpy(changed, &hchanged, sizeof(hchanged), cudaMemcpyHostToDevice));
 
-		drelax <<<kconf.getNumberOfBlocks(), kconf.getNumberOfBlockThreads()>>> (dist, graph, changed);
+		drelax <<<1, kconf.getNumberOfBlockThreads()>>> (dist, graph, changed);
 		CudaTest("solving failed");
 
 		CUDA_SAFE_CALL(cudaMemcpy(&hchanged, changed, sizeof(hchanged), cudaMemcpyDeviceToHost));
+		break;
 	} while (hchanged);
 	CUDA_SAFE_CALL(cudaDeviceSynchronize());
 	endtime = rtclock();

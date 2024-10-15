@@ -244,7 +244,7 @@ int compute_tran_temp(float *MatrixPower,float *MatrixTemp[2], int col, int row,
             int temp = src;
             src = dst;
             dst = temp;
-            calculate_temp<<<dimGrid, dimBlock>>>(MIN(num_iterations, total_iterations-t), MatrixPower,MatrixTemp[src],MatrixTemp[dst],\
+            calculate_temp<<<1, dimBlock>>>(MIN(num_iterations, total_iterations-t), MatrixPower,MatrixTemp[src],MatrixTemp[dst],\
 		col,row,borderCols, borderRows, Cap,Rx,Ry,Rz,step,time_elapsed);
 	}
         return dst;
@@ -264,6 +264,7 @@ void usage(int argc, char **argv)
 
 int main(int argc, char** argv)
 {
+	 
   printf("WG size of kernel = %d X %d\n", BLOCK_SIZE, BLOCK_SIZE);
 
     run(argc,argv);

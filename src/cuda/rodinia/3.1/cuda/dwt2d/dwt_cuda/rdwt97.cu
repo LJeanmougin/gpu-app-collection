@@ -322,7 +322,7 @@ namespace dwt_cuda {
     
     // finally launch kernel
     PERF_BEGIN
-    rdwt97Kernel<WIN_SX, WIN_SY><<<gSize, WIN_SX>>>(in, out, sx, sy, steps);
+    rdwt97Kernel<WIN_SX, WIN_SY><<<1, WIN_SX>>>(in, out, sx, sy, steps);
     PERF_END("        RDWT97", sx, sy)
     CudaDWTTester::checkLastKernelCall("RDWT 9/7 kernel");
   }

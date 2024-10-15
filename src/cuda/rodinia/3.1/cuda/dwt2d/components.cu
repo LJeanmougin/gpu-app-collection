@@ -149,7 +149,7 @@ void rgbToComponents(T *d_r, T *d_g, T *d_b, unsigned char * src, int width, int
     dim3 threads(THREADS);
     dim3 grid(alignedSize/(THREADS*3));
     assert(alignedSize%(THREADS*3) == 0);
-    c_CopySrcToComponents<<<grid, threads>>>(d_r, d_g, d_b, d_src, pixels);
+    c_CopySrcToComponents<<<1, threads>>>(d_r, d_g, d_b, d_src, pixels);
     cudaCheckAsyncError("CopySrcToComponents kernel")
 
     /* Free Memory */
@@ -181,7 +181,7 @@ void bwToComponent(T *d_c, unsigned char * src, int width, int height)
     dim3 threads(THREADS);
     dim3 grid(alignedSize/(THREADS));
     assert(alignedSize%(THREADS) == 0);
-    c_CopySrcToComponent<<<grid, threads>>>(d_c, d_src, pixels);
+    c_CopySrcToComponent<<<1, threads>>>(d_c, d_src, pixels);
     cudaCheckAsyncError("CopySrcToComponent kernel")
 
     /* Free Memory */

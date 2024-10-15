@@ -15,6 +15,7 @@ void morton(int i, int *x, int *y)
 
 int main(int argc, char ** argv)
 {
+	 
   int i;
   for (i = 0; i < 100; i++)
   {

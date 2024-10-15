@@ -138,7 +138,7 @@ void bfs(Graph &graph, foru *dist)
 
 	for (unsigned unroll=VERTICALWORKPERTHREAD; unroll <= VERTICALWORKPERTHREAD; ++unroll) {
 	  //printf("initializing (nblocks=%d, blocksize=%d).\n", NBLOCKS*FACTOR, BLKSIZE);
-	  initialize <<<NBLOCKS*FACTOR, BLKSIZE>>> (dist, nv);
+	  initialize <<<1, BLKSIZE>>> (dist, nv);
 	  CudaTest("initializing failed");
 	  cudaMemcpy(&dist[0], &zero, sizeof(zero), cudaMemcpyHostToDevice);
 
@@ -157,9 +157,10 @@ void bfs(Graph &graph, foru *dist)
 
 	    //sree: why are nedges and nv pointers?
 
-	    drelax <<<nblocks/WORKPERTHREAD, BLKSIZE>>> (dist, graph.edgessrcdst, graph.edgessrcwt, graph.psrc, graph.noutgoing, nedges, nv, changed, graph.srcsrc, unroll);
+	    drelax <<<1, BLKSIZE>>> (dist, graph.edgessrcdst, graph.edgessrcwt, graph.psrc, graph.noutgoing, nedges, nv, changed, graph.srcsrc, unroll);
 	    CudaTest("solving failed");
 	    cudaMemcpy(&hchanged, changed, sizeof(bool), cudaMemcpyDeviceToHost);
+		break;
 	  } while (hchanged);
 	  cudaEventRecord(stop, 0);  cudaEventSynchronize(stop);  cudaEventElapsedTime(&time, start, stop);
 	  endtime = rtclock();

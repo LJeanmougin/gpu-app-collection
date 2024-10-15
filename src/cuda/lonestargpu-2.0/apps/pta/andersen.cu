@@ -2400,7 +2400,7 @@ __host__ void initializeEdges(uint* &constraintsName, uint &constraintNumber, ui
   device_vector<uint> dstIndex(numConstraints);
   sequence(dstIndex.begin(), dstIndex.begin() + numConstraints);    
   uint numSrc = unique_by_key(src, src + numConstraints, dstIndex.begin()).first - src;    
-  addEdges<<<getBlocks() * 3, dimInitialize>>>(constraints, raw_pointer_cast(&dstIndex[0]), 
+  addEdges<<<1, dimInitialize>>>(constraints, raw_pointer_cast(&dstIndex[0]), 
       constraints + numConstraints, numSrc, rel); 
   if (rel == STORE) {
     cudaSafeCall(cudaMemcpyToSymbol(__numStore__, &numSrc, uintSize));    
@@ -2416,7 +2416,7 @@ extern "C" void createGraph(const uint numObjectVars, const uint maxOffset) {
   const uint startTime = clock();
   dim3 dim(WARP_SIZE, getThreadsPerBlock(DEF_THREADS_PER_BLOCK)/ WARP_SIZE);
 
-  initialize<<<getBlocks(), dim>>>();
+  initialize<<<1, dim>>>();
   checkKernelErrors("ERROR at initialize");
 
   initializeEdges(__ptsConstraints__, __numPtsConstraints__, NEXT_DIFF_PTS);
@@ -2425,7 +2425,7 @@ extern "C" void createGraph(const uint numObjectVars, const uint maxOffset) {
   initializeEdges(__storeConstraints__, __numStoreConstraints__, STORE);
   // no need to add GEP_INV edges, there is only one per variable
 
-  createOffsetMasks<<<getBlocks(), dim>>>(numObjectVars, maxOffset);
+  createOffsetMasks<<<1, dim>>>(numObjectVars, maxOffset);
   checkKernelErrors("ERROR while creating the offset mask");
   uint* size;
   cudaSafeCall(cudaMemcpyFromSymbol(&size, __size__, sizeof(uint*)));    
@@ -2531,7 +2531,7 @@ extern "C" uint andersen(uint numVars) {
     cudaSafeCall(cudaMemcpyFromSymbol(&ptsStartIndex, __ptsFreeList__, uintSize));
   //printf("\tstart = %d.\n", ptsStartIndex);
     printRule("    updating pts...");
-    updatePtsInformation<<<blocks, dimUpdate2>>>();
+    updatePtsInformation<<<1, dimUpdate2>>>();
     checkKernelErrors("ERROR at update pts");
     printRule("done\n");
     addTimeToRule(updatePtsTime, ruleTime);
@@ -2540,6 +2540,7 @@ extern "C" uint andersen(uint numVars) {
     if (done) {
       break;
     }
+
     // Ideally, we would use one stream to copy all the points-to edges discovered during the 
     // last iteration (resident in the interval [CURR_DIFF_PTS_START, __currDiffPtsFreeList__]) 
     // back to the host while the other stream computes the next iteration, computation that does
@@ -2552,26 +2553,26 @@ extern "C" uint andersen(uint numVars) {
     // for the data transfer.
        
     printRule("    hcd...");
-    hcd<<<hcdBlocks, dimHcd>>>();
+    hcd<<<1, dimHcd>>>();
     checkKernelErrors("ERROR at hcd rule");                    
-    updateInfo<<<3 * blocks, dim512>>>();
+    updateInfo<<<1, dim512>>>();
     checkKernelErrors("ERROR while updating information after collapsing");
     printRule("done\n");
     addTimeToRule(hcdTime, ruleTime);
 
     printRule("    finding curr_pts equivalences...");
-    computeCurrPtsHash<<<3 * blocks, dim512>>>();
+    computeCurrPtsHash<<<1, dim512>>>();
     checkKernelErrors("ERROR at compute hash");
     uint numKeys;
     cudaSafeCall(cudaMemcpyFromSymbol(&numKeys, __numKeys__, uintSize));
     buildHashMap(key, val, numKeys);
-    findCurrPtsEquivalents<<<3 * blocks, dim512>>>();
+    findCurrPtsEquivalents<<<1, dim512>>>();
     checkKernelErrors("ERROR in finding CURR_PTS equivalents");       
     printRule("done\n");
     addTimeToRule(ptsEquivTime, ruleTime);
     
     printRule("    copy_inv and load_inv and store2storeInv...");
-    copyInv_loadInv_store2storeInv<<<blocks, dimCopy>>>();
+    copyInv_loadInv_store2storeInv<<<1, dimCopy>>>();
     checkKernelErrors("ERROR at copy_inv/load_inv/store2storeinv rule");        
   
     cudaSafeCall(cudaMemcpyFromSymbol(&numKeys, __numKeys__, uintSize));    
@@ -2584,19 +2585,20 @@ extern "C" uint andersen(uint numVars) {
     addTimeToRule(copyInvTime, ruleTime);
     
     printRule("    store_inv...");
-    storeInv<<<blocks, dimStore>>>();
+    storeInv<<<1, dimStore>>>();
     checkKernelErrors("ERROR at store_inv rule");
     printRule("done\n");
     addTimeToRule(storeInvTime, ruleTime);
 
     printRule("    gep_inv...");
-    gepInv<<<blocks, dimGep>>>();
+    gepInv<<<1, dimGep>>>();
     checkKernelErrors("ERROR at gep_inv rule");
     printRule("done\n");
     addTimeToRule(gepInvTime, ruleTime);
 
     iteration++;
     printf(".");
+    break;
   }
   printf("OK.\n");
   printf("Iterations = %u.\n", iteration);

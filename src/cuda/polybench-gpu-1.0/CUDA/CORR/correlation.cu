@@ -271,13 +271,13 @@ void correlationCuda(DATA_TYPE* data, DATA_TYPE* mean, DATA_TYPE* stddev, DATA_T
 	dim3 grid4((size_t)(ceil((float)(M)) / ((float)DIM_THREAD_BLOCK_KERNEL_4_X)), 1);
 
 	t_start = rtclock();
-	mean_kernel<<< grid1, block1 >>>(mean_gpu,data_gpu);
+	mean_kernel<<< 1, block1 >>>(mean_gpu,data_gpu);
 	cudaThreadSynchronize();
-	std_kernel<<< grid2, block2 >>>(mean_gpu,stddev_gpu,data_gpu);
+	std_kernel<<< 1, block2 >>>(mean_gpu,stddev_gpu,data_gpu);
 	cudaThreadSynchronize();
-	reduce_kernel<<< grid3, block3 >>>(mean_gpu,stddev_gpu,data_gpu);
+	reduce_kernel<<< 1, block3 >>>(mean_gpu,stddev_gpu,data_gpu);
 	cudaThreadSynchronize();
-	corr_kernel<<< grid4, block4 >>>(symmat_gpu,data_gpu);
+	corr_kernel<<< 1, block4 >>>(symmat_gpu,data_gpu);
 	cudaThreadSynchronize();
 	t_end = rtclock();
 	fprintf(stdout, "GPU Runtime: %0.6lfs\n", t_end - t_start);	
@@ -316,13 +316,15 @@ int main()
 
 	correlationCuda(data, mean, stddev, symmat, symmat_outputFromGpu);
 
-	t_start = rtclock();
-	correlation(data, mean, stddev, symmat);
-	t_end = rtclock();
+	// L.Jeanmougin : No comparison needed for exp
 
-	fprintf(stdout, "CPU Runtime: %0.6lfs\n", t_end - t_start);
+	// t_start = rtclock();
+	// correlation(data, mean, stddev, symmat);
+	// t_end = rtclock();
+
+	// fprintf(stdout, "CPU Runtime: %0.6lfs\n", t_end - t_start);
     
-	compareResults(symmat, symmat_outputFromGpu);
+	// compareResults(symmat, symmat_outputFromGpu);
 
 	free(data);
 	free(mean);

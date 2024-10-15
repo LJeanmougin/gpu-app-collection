@@ -478,8 +478,11 @@ extern "C" int gpu_compute_cutoff_potential_lattice(
   }
 
   /* setup CUDA kernel parameters */
-  gridDim.x = 4 * xRegionDim;
-  gridDim.y = yRegionDim;
+  // L.Jeanmougin : reducing to 1 block
+  // gridDim.x = 4 * xRegionDim;
+  // gridDim.y = yRegionDim;
+  gridDim.x = 1;
+  gridDim.y = 1;
   gridDim.z = 1;
   blockDim.x = 8;
   blockDim.y = 8;

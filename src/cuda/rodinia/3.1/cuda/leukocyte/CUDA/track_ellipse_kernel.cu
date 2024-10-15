@@ -232,7 +232,7 @@ void IMGVF_cuda(MAT **I, MAT **IMGVF, double vx, double vy, double e, int max_it
 	IMGVF_cuda_init(I, num_cells);
 	
 	// Compute the MGVF on the GPU
-	IMGVF_kernel <<< num_cells, threads_per_block >>>
+	IMGVF_kernel <<< 1, threads_per_block >>>
 				( device_IMGVF_array, device_I_array, device_m_array, device_n_array,
 				  (float) vx, (float) vy, (float) e, max_iterations, (float) cutoff );
 	

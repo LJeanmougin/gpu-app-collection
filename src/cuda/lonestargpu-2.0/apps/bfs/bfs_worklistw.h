@@ -122,7 +122,7 @@ void bfs(Graph &graph, foru *dist)
 	FACTOR = (NVERTICES + MAXBLOCKSIZE * NBLOCKS - 1) / (MAXBLOCKSIZE * NBLOCKS);
 
 	printf("initializing (nblocks=%d, blocksize=%d).\n", NBLOCKS*FACTOR, MAXBLOCKSIZE);
-	initialize <<<NBLOCKS*FACTOR, MAXBLOCKSIZE>>> (dist, graph.nnodes);
+	initialize <<<1, MAXBLOCKSIZE>>> (dist, graph.nnodes);
 	CudaTest("initializing failed");
 	cudaMemcpy(&dist[0], &foruzero, sizeof(foruzero), cudaMemcpyHostToDevice);
 
@@ -154,7 +154,7 @@ void bfs(Graph &graph, foru *dist)
 		CUDA_SAFE_CALL(cudaMemcpy(nerr, &intzero, sizeof(intzero), cudaMemcpyHostToDevice));
 		//printf("invoking drelax with %d blocks, blocksize=%d, wlsize=%d, outwlsize=%d, iteration=%d.\n", nblocks, BLOCKSIZE, inwlptr->getSize(), outwlptr->getSize(), iteration);
 		//inwlptr->printHost();
-		drelax <<<nblocks, BLOCKSIZE>>> (dist, graph, *inwlptr, *outwlptr, nerr);
+		drelax <<<1, BLOCKSIZE>>> (dist, graph, *inwlptr, *outwlptr, nerr);
 		CudaTest("solving failed");
 		//outwlptr->printHost();
 		CUDA_SAFE_CALL(cudaMemcpy(&hnerr, nerr, sizeof(hnerr), cudaMemcpyDeviceToHost));
@@ -183,7 +183,8 @@ void bfs(Graph &graph, foru *dist)
 		outwlptr->clearHost();	// clear it whether overflow or not.
 		//printf("\tcleared: inwlsz=%d, outwlsz=%d.\n", inwlptr->getSize(), outwlptr->getSize());
 		//getchar();
-	} while (wlsz);
+		break;
+	} while (true);
 	CUDA_SAFE_CALL(cudaDeviceSynchronize());
 	endtime = rtclock();
 	

@@ -21,7 +21,8 @@
 #include <math.h>
 #include <cuda.h>
 
-#define MAX_THREADS_PER_BLOCK 512
+// Changed from 512 to 1024
+#define MAX_THREADS_PER_BLOCK 1024
 
 int no_of_nodes;
 int edge_list_size;
@@ -178,7 +179,7 @@ void BFSGraph( int argc, char** argv)
 	printf("Copied Everything to GPU memory\n");
 
 	// setup execution parameters
-	dim3  grid( num_of_blocks, 1, 1);
+	dim3  grid( 1, 1, 1);
 	dim3  threads( num_of_threads_per_block, 1, 1);
 
 	int k=0;

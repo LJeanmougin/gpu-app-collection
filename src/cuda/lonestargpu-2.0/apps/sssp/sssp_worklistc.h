@@ -358,7 +358,7 @@ void sssp(foru *hdist, foru *dist, Graph &graph, unsigned long totalcomm)
 	FACTOR = (NVERTICES + MAXBLOCKSIZE * NBLOCKS - 1) / (MAXBLOCKSIZE * NBLOCKS);
 
 	//printf("initializing (nblocks=%d, blocksize=%d).\n", NBLOCKS*FACTOR, MAXBLOCKSIZE);
-	initialize <<<NBLOCKS*FACTOR, MAXBLOCKSIZE>>> (dist, graph.nnodes);
+	initialize <<<1, MAXBLOCKSIZE>>> (dist, graph.nnodes);
 	CudaTest("initializing failed");
 	cudaMemcpy(&dist[0], &foruzero, sizeof(foruzero), cudaMemcpyHostToDevice);
 
@@ -412,7 +412,7 @@ void sssp(foru *hdist, foru *dist, Graph &graph, unsigned long totalcomm)
 		//inwl->display_items();
 		//drelax2 <<<14, BLKSIZE>>> (dist, graph, nerr, *inwl, *outwl, dwp, gb);
 		
-		drelax3 <<<nblocks, BLKSIZE>>> (dist, graph, nerr, *inwl, *outwl, iteration, gb);
+		drelax3 <<<1, BLKSIZE>>> (dist, graph, nerr, *inwl, *outwl, iteration, gb);
 		nitems = outwl->nitems();
 
 		//remove_dups<<<14, 1024>>>(*outwl, node_owners, gb);
@@ -427,6 +427,7 @@ void sssp(foru *hdist, foru *dist, Graph &graph, unsigned long totalcomm)
 		outwl = tmp;
 
 		outwl->reset();
+		break;
 	} while (nitems > 0);
 	CUDA_SAFE_CALL(cudaDeviceSynchronize());
 	endtime = rtclock();

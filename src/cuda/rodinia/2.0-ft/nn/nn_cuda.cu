@@ -210,7 +210,8 @@ int main(int argc, char* argv[])
 		dim3 dimGrid( (REC_WINDOW/dimBlock.x) + (!(REC_WINDOW%dimBlock.x)?0:1) );
 
 		//Add a and b, store in c
-		euclid<<<dimGrid,dimBlock>>>(data, x2, y2, z_d, REC_WINDOW, REC_LENGTH, LATITUDE_POS);
+		// CHANGING BLOCK COUNT TO 1
+		euclid<<<1,dimBlock>>>(data, x2, y2, z_d, REC_WINDOW, REC_LENGTH, LATITUDE_POS);
 		cudaThreadSynchronize();
 		
 		//Copy data from device memory to host memory

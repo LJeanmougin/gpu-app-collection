@@ -242,7 +242,7 @@ float pgain( long x, Points *points, float z, long int *numcenters, int kmax, bo
 	int num_blocks_x = (int) ((float) (num_blocks+num_blocks_y - 1) / (float) num_blocks_y);	
 	dim3 grid_size(num_blocks_x, num_blocks_y, 1);
 
-	kernel_compute_cost<<<grid_size, THREADS_PER_BLOCK>>>(	
+	kernel_compute_cost<<<1, THREADS_PER_BLOCK>>>(	
 															num,					// in:	# of data
 															dim,					// in:	dimension of point coordinates
 															x,						// in:	point to open a center at

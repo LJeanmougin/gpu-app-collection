@@ -80,10 +80,11 @@ void sssp(foru *hdist, foru *dist, Graph &graph, long unsigned totalcommu)
 
 		cudaMemcpy(changed, &hchanged, sizeof(hchanged), cudaMemcpyHostToDevice);
 
-		drelax <<<kconf.getNumberOfBlocks(), kconf.getNumberOfBlockThreads()>>> (dist, graph, changed);
+		drelax <<<1, kconf.getNumberOfBlockThreads()>>> (dist, graph, changed);
 		CudaTest("solving failed");
 
 		CUDA_SAFE_CALL(cudaMemcpy(&hchanged, changed, sizeof(hchanged), cudaMemcpyDeviceToHost));
+		break;
 	} while (hchanged);
 	CUDA_SAFE_CALL(cudaDeviceSynchronize());
 	endtime = rtclock(); // changed from lsg (for now) which included memcopies of graph too.

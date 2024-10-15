@@ -204,7 +204,7 @@ void TPACF(hist_t * histograms, REAL* d_x_data, REAL* d_y_data,
   dim3 dimBlock(BLOCK_SIZE);
   dim3 dimGrid(NUM_SETS*2 + 1);
 
-  gen_hists <<< dimGrid, dimBlock >>> ( histograms, d_x_data, 
+  gen_hists <<< 1, dimBlock >>> ( histograms, d_x_data, 
 					d_y_data, d_z_data, NUM_SETS, 
 					NUM_ELEMENTS);
 }

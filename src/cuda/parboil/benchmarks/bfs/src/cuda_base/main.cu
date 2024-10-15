@@ -168,20 +168,22 @@ int main(int argc, char** argv)
     if(num_of_blocks >1 && num_of_blocks <= NUM_SM)// will call "BFS_kernel_multi_blk_inGPU"
       num_of_blocks = NUM_SM;
 
-    dim3  grid( num_of_blocks, 1, 1);
+  // L.Jeanmougin : reducing to 1 block
+    // dim3  grid( num_of_blocks, 1, 1);
+    dim3 grid(1, 1, 1);
     dim3  threads( num_of_threads_per_block, 1, 1);
 
     if(k%2 == 0){
-      BFS_kernel<<< grid, threads >>>(d_q1,d_q2, d_graph_nodes, 
+      BFS_kernel<<< 1, threads >>>(d_q1,d_q2, d_graph_nodes, 
           d_graph_edges, d_color, d_cost, num_t, tail,GRAY0,k);
     }
     else{
-      BFS_kernel<<< grid, threads >>>(d_q2,d_q1, d_graph_nodes, 
+      BFS_kernel<<< 1, threads >>>(d_q2,d_q1, d_graph_nodes, 
           d_graph_edges, d_color, d_cost, num_t, tail, GRAY1,k);
     }
     k++;
   }
-  while(1);
+  while(0);
   cudaThreadSynchronize();
   pb_SwitchToTimer(&timers, pb_TimerID_COPY);
   printf("GPU kernel done\n");

@@ -198,7 +198,7 @@ int main(int argc, char **argv)
     int sourceVertex = 0;
 
     // Launch the initialization kernel
-    vector_init <<<grid, threads>>>(vector_d1, vector_d2, sourceVertex, num_nodes);
+    vector_init <<<1, threads>>>(vector_d1, vector_d2, sourceVertex, num_nodes);
     cudaThreadSynchronize();
     err = cudaGetLastError();
     if (err != cudaSuccess) {
@@ -221,15 +221,15 @@ int main(int argc, char **argv)
         }
 
         // Launch the assignment kernel
-        vector_assign <<<grid, threads>>>(vector_d1, vector_d2, num_nodes);
+        vector_assign <<<1, threads>>>(vector_d1, vector_d2, num_nodes);
 
         // Launch the min.+ kernel
-        spmv_min_dot_plus_kernel <<<grid, threads>>>(num_nodes, row_d, col_d,
+        spmv_min_dot_plus_kernel <<<1, threads>>>(num_nodes, row_d, col_d,
                                                      data_d, vector_d1,
                                                      vector_d2);
 
         // Launch the check kernel
-        vector_diff <<<grid, threads>>>(vector_d1, vector_d2,
+        vector_diff <<<1, threads>>>(vector_d1, vector_d2,
                                         stop_d, num_nodes);
 
         // Read the termination variable back

@@ -128,7 +128,7 @@ int main(int argc, char *argv[]) {
 	kconf.setProblemSize(graph.nnodes);
 	kconf.setMaxThreadsPerBlock();
 	printf("verifying.\n");
-	dverifysolution<<<kconf.getNumberOfBlocks(), kconf.getNumberOfBlockThreads()>>> (dist, graph, nerr);
+	dverifysolution<<<1, kconf.getNumberOfBlockThreads()>>> (dist, graph, nerr);
 	CudaTest("dverifysolution failed");
 	CUDA_SAFE_CALL(cudaMemcpy(&hnerr, nerr, sizeof(hnerr), cudaMemcpyDeviceToHost));
 	printf("\tno of errors = %d.\n", hnerr);

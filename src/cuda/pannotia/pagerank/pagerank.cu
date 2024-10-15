@@ -186,7 +186,7 @@ int main(int argc, char **argv)
     double timer3 = gettime();
 
     // Launch the initialization kernel
-    inibuffer <<<grid, threads>>>(row_d, pagerank1_d, pagerank2_d, num_nodes,
+    inibuffer <<<1, threads>>>(row_d, pagerank1_d, pagerank2_d, num_nodes,
                                   num_edges);
     cudaThreadSynchronize();
     err = cudaGetLastError();
@@ -198,11 +198,11 @@ int main(int argc, char **argv)
     // Run PageRank for some iter. TO: convergence determination
     for (int i = 0; i < ITER; i++) {
         // Launch pagerank kernel 1
-        pagerank1 <<<grid, threads>>>(row_d, col_d, data_d, pagerank1_d,
+        pagerank1 <<<1, threads>>>(row_d, col_d, data_d, pagerank1_d,
                                       pagerank2_d, num_nodes, num_edges);
 
         // Launch pagerank kernel 2
-        pagerank2 <<<grid, threads>>>(row_d, col_d, data_d, pagerank1_d,
+        pagerank2 <<<1, threads>>>(row_d, col_d, data_d, pagerank1_d,
                                       pagerank2_d, num_nodes, num_edges);
     }
     cudaThreadSynchronize();

@@ -56,7 +56,7 @@ void basicSgemm( char transa, char transb, int m, int n, int k, float alpha, con
 
 
   dim3 grid( m/TILE_SZ, n/TILE_SZ ), threads( TILE_SZ, TILE_SZ );
-  mysgemmNT<<<grid, threads>>>( A, lda, B, ldb, C, ldc, k, alpha, beta);
+  mysgemmNT<<<1, threads>>>( A, lda, B, ldb, C, ldc, k, alpha, beta);
   CHECK_ERROR("mySgemm");
 
 }

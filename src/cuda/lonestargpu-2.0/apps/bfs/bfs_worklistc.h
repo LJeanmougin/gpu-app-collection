@@ -353,7 +353,7 @@ void bfs(Graph &graph, foru *dist)
 	FACTOR = (NVERTICES + MAXBLOCKSIZE * NBLOCKS - 1) / (MAXBLOCKSIZE * NBLOCKS);
 
 	//printf("initializing (nblocks=%d, blocksize=%d).\n", NBLOCKS*FACTOR, MAXBLOCKSIZE);
-	initialize <<<NBLOCKS*FACTOR, MAXBLOCKSIZE>>> (dist, graph.nnodes);
+	initialize <<<1, MAXBLOCKSIZE>>> (dist, graph.nnodes);
 	CudaTest("initializing failed");
 	cudaMemcpy(&dist[0], &foruzero, sizeof(foruzero), cudaMemcpyHostToDevice);
 
@@ -382,7 +382,7 @@ void bfs(Graph &graph, foru *dist)
 	  gb.Setup(deviceProp.multiProcessorCount * drelax2_max_blocks);
 
 	  drelax2<<<1, BLKSIZE>>>(dist, graph, nerr, *inwl, *outwl, 0, gb);
-	  drelax2 <<<deviceProp.multiProcessorCount * drelax2_max_blocks, BLKSIZE>>> (dist, graph, nerr, *inwl, *outwl, 1, gb);
+	  drelax2 <<<1, BLKSIZE>>> (dist, graph, nerr, *inwl, *outwl, 1, gb);
 	}
 	else {
 	  drelax3<<<1, BLKSIZE>>>(dist, graph, nerr, *inwl, *outwl, 0);
@@ -395,7 +395,7 @@ void bfs(Graph &graph, foru *dist)
 	    //printf("ITERATION: %d\n", iteration);
 	    //inwl->display_items();
 
-	    drelax3<<<nblocks, BLKSIZE>>>(dist, graph, nerr, *inwl, *outwl, iteration);
+	    drelax3<<<1, BLKSIZE>>>(dist, graph, nerr, *inwl, *outwl, iteration);
   
 	    nitems = outwl->nitems();
 
@@ -406,6 +406,7 @@ void bfs(Graph &graph, foru *dist)
 	    outwl = tmp;
 	    
 	    outwl->reset();
+		break;
 	  };  
 	}
 	

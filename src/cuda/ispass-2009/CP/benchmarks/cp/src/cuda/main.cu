@@ -183,7 +183,7 @@ int main(int argc, char** argv) {
       pb_SwitchToTimer(&timers, pb_TimerID_GPU);
  
       // RUN the kernel...
-      cenergy<<<Gsz, Bsz, 0>>>(runatoms, 0.1, d_output);
+      cenergy<<<1, Bsz, 0>>>(runatoms, 0.1, d_output);
       CUERR // check and clear any existing errors
 
       if (parameters->synchronizeGpu) cudaThreadSynchronize();

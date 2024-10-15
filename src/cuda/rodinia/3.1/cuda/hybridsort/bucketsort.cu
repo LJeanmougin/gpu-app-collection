@@ -45,18 +45,23 @@ unsigned int *l_offsets = NULL;
 ////////////////////////////////////////////////////////////////////////////////
 void init_bucketsort(int listsize)
 {
-	h_offsets = (unsigned int *) malloc(histosize * sizeof(int)); 
-    checkCudaErrors(cudaMalloc((void**) &d_offsets, histosize * sizeof(unsigned int)));
+	h_offsets = (unsigned int *) malloc(histosize * sizeof(int));
+	// (cudaMalloc((void **)&d_offsets, histosize * sizeof(unsigned int)));
+	cudaMalloc((void**) &d_offsets, histosize * sizeof(unsigned int));
 	pivotPoints = (float *)malloc(DIVISIONS * sizeof(float)); 
 
-    checkCudaErrors(cudaMalloc((void**) &d_indice, listsize * sizeof(int)));
+    // (cudaMalloc((void**) &d_indice, listsize * sizeof(int)));
+	cudaMalloc((void**) &d_indice, listsize * sizeof(int));
 	historesult = (float *)malloc(histosize * sizeof(float)); 
 
-	checkCudaErrors(cudaMalloc((void**) &l_pivotpoints, DIVISIONS * sizeof(float))); 
-	checkCudaErrors(cudaMalloc((void**) &l_offsets, DIVISIONS * sizeof(int))); 
+	// (cudaMalloc((void**) &l_pivotpoints, DIVISIONS * sizeof(float))); 
+	cudaMalloc((void**) &l_pivotpoints, DIVISIONS * sizeof(float));
+	// (cudaMalloc((void**) &l_offsets, DIVISIONS * sizeof(int))); 
+	cudaMalloc((void**) &l_offsets, DIVISIONS * sizeof(int));
 
 	int blocks = ((listsize - 1) / (BUCKET_THREAD_N * BUCKET_BAND)) + 1; 
-	checkCudaErrors(cudaMalloc((void**) &d_prefixoffsets, blocks * BUCKET_BLOCK_MEMORY * sizeof(int))); 
+	// (cudaMalloc((void**) &d_prefixoffsets, blocks * BUCKET_BLOCK_MEMORY * sizeof(int))); 
+	cudaMalloc((void**) &d_prefixoffsets, blocks * BUCKET_BLOCK_MEMORY * sizeof(int));
 
 	initHistogram1024();
 }
@@ -66,14 +71,14 @@ void init_bucketsort(int listsize)
 ////////////////////////////////////////////////////////////////////////////////
 void finish_bucketsort()
 {
-    checkCudaErrors(cudaFree(d_indice));
-	checkCudaErrors(cudaFree(d_offsets));
-	checkCudaErrors(cudaFree(l_pivotpoints));
-	checkCudaErrors(cudaFree(l_offsets)); 
+    (cudaFree(d_indice));
+	(cudaFree(d_offsets));
+	(cudaFree(l_pivotpoints));
+	(cudaFree(l_offsets)); 
 	free(pivotPoints); 
 	free(h_offsets);
 	free(historesult);	
-	checkCudaErrors(cudaFree(d_prefixoffsets)); 
+	(cudaFree(d_prefixoffsets)); 
 	closeHistogram1024();
 }
 
@@ -88,7 +93,7 @@ void bucketSort(float *d_input, float *d_output, int listsize,
 	////////////////////////////////////////////////////////////////////////////
 	// First pass - Create 1024 bin histogram 
 	////////////////////////////////////////////////////////////////////////////
-	checkCudaErrors(cudaMemset((void *) d_offsets, 0, histosize * sizeof(int))); 
+	(cudaMemset((void *) d_offsets, 0, histosize * sizeof(int))); 
 	histogram1024GPU(h_offsets, d_input, minimum, maximum, listsize); 
 	for(int i=0; i<histosize; i++) historesult[i] = (float)h_offsets[i];
 
@@ -101,15 +106,15 @@ void bucketSort(float *d_input, float *d_output, int listsize,
 	///////////////////////////////////////////////////////////////////////////
 	// Count the bucket sizes in new divisions
 	///////////////////////////////////////////////////////////////////////////
-	checkCudaErrors(cudaMemcpy(l_pivotpoints, pivotPoints, (DIVISIONS)*sizeof(int), cudaMemcpyHostToDevice)); 
-	checkCudaErrors(cudaMemset((void *) d_offsets, 0, DIVISIONS * sizeof(int))); 
-	checkCudaErrors(cudaBindTexture(0, texPivot, l_pivotpoints, DIVISIONS * sizeof(int))); 
+	(cudaMemcpy(l_pivotpoints, pivotPoints, (DIVISIONS)*sizeof(int), cudaMemcpyHostToDevice)); 
+	(cudaMemset((void *) d_offsets, 0, DIVISIONS * sizeof(int))); 
+	(cudaBindTexture(0, texPivot, l_pivotpoints, DIVISIONS * sizeof(int))); 
 	// Setup block and grid
     dim3 threads(BUCKET_THREAD_N, 1);
 	int blocks = ((listsize - 1) / (threads.x * BUCKET_BAND)) + 1; 
     dim3 grid(blocks, 1);
 	// Find the new indice for all elements
-	bucketcount <<< grid, threads >>>(d_input, d_indice, d_prefixoffsets, listsize);
+	bucketcount <<< 1, threads >>>(d_input, d_indice, d_prefixoffsets, listsize);
 	///////////////////////////////////////////////////////////////////////////
 	// Prefix scan offsets and align each division to float4 (required by 
 	// mergesort)
@@ -120,7 +125,7 @@ threads.x = BUCKET_WG_SIZE_0;
 	threads.x = 128;  
 #endif
 	grid.x = DIVISIONS / threads.x; 
-	bucketprefixoffset <<< grid, threads >>>(d_prefixoffsets, d_offsets, blocks); 	
+	bucketprefixoffset <<< 1, threads >>>(d_prefixoffsets, d_offsets, blocks); 	
 
 	// copy the sizes from device to host
 	cudaMemcpy(h_offsets, d_offsets, DIVISIONS * sizeof(int), cudaMemcpyDeviceToHost);
@@ -148,7 +153,7 @@ threads.x = BUCKET_WG_SIZE_0;
     threads.x = BUCKET_THREAD_N; 
 	blocks = ((listsize - 1) / (threads.x * BUCKET_BAND)) + 1; 
     grid.x = blocks; 
-	bucketsort <<< grid, threads >>>(d_input, d_indice, d_output, listsize, d_prefixoffsets, l_offsets);
+	bucketsort <<< 1, threads >>>(d_input, d_indice, d_output, listsize, d_prefixoffsets, l_offsets);
 }
 
 

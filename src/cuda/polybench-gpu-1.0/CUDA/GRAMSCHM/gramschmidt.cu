@@ -186,13 +186,13 @@ void gramschmidtCuda(DATA_TYPE* A, DATA_TYPE* R, DATA_TYPE* Q, DATA_TYPE* A_outp
 	
 	t_start = rtclock();
 	int k;
-	for (k = 0; k < N; k++)
+	for (k = 0; k < 5/* N */; k++)
 	{
-		gramschmidt_kernel1<<<gridKernel1,block>>>(A_gpu, R_gpu, Q_gpu, k);
+		gramschmidt_kernel1<<<1,block>>>(A_gpu, R_gpu, Q_gpu, k);
 		cudaThreadSynchronize();
-		gramschmidt_kernel2<<<gridKernel2,block>>>(A_gpu, R_gpu, Q_gpu, k);
+		gramschmidt_kernel2<<<1,block>>>(A_gpu, R_gpu, Q_gpu, k);
 		cudaThreadSynchronize();
-		gramschmidt_kernel3<<<gridKernel3,block>>>(A_gpu, R_gpu, Q_gpu, k);
+		gramschmidt_kernel3<<<1,block>>>(A_gpu, R_gpu, Q_gpu, k);
 		cudaThreadSynchronize();
 	}
 	t_end = rtclock();

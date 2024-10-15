@@ -45,6 +45,7 @@
 
 int main(int argc, char *argv []){
 
+	 
 	//================================================================================80
 	// 	VARIABLES
 	//================================================================================80
@@ -267,7 +268,7 @@ int main(int argc, char *argv []){
 	// all kernels operating on entire matrix
 	threads.x = NUMBER_THREADS;												// define the number of threads in the block
 	threads.y = 1;
-	blocks_x = Ne/threads.x;
+	blocks_x = 1;
 	if (Ne % threads.x != 0){												// compensate for division remainder above by adding one grid
 		blocks_x = blocks_x + 1;																	
 	}
@@ -288,7 +289,7 @@ int main(int argc, char *argv []){
 	// 	SCALE IMAGE DOWN FROM 0-255 TO 0-1 AND EXTRACT
 	//================================================================================80
 
-	extract<<<blocks, threads>>>(	Ne,
+	extract<<<1, threads>>>(	Ne,
 									d_I);
 
 	checkCUDAError("extract");
@@ -301,112 +302,107 @@ int main(int argc, char *argv []){
 
 	// printf("iterations: ");
 
-	// execute main loop
-	for (iter=0; iter<niter; iter++){										// do for the number of iterations input parameter
+	// execute main loop						// do for the number of iterations input parameter
 
 	// printf("%d ", iter);
 	// fflush(NULL);
 
-		// execute square kernel
-		prepare<<<blocks, threads>>>(	Ne,
-										d_I,
-										d_sums,
-										d_sums2);
+	// execute square kernel
+	prepare<<<1, threads>>>(Ne,
+							  d_I,
+							  d_sums,
+							  d_sums2);
 
-		checkCUDAError("prepare");
+	checkCUDAError("prepare");
+	// performs subsequent reductions of sums
+	blocks2.x = blocks.x; // original number of blocks
+	blocks2.y = blocks.y;
+	no = Ne; // original number of sum elements
+	mul = 1; // original multiplier
 
-		// performs subsequent reductions of sums
-		blocks2.x = blocks.x;												// original number of blocks
-		blocks2.y = blocks.y;												
-		no = Ne;														// original number of sum elements
-		mul = 1;														// original multiplier
+	checkCUDAError("before reduce");
 
-		while(blocks2.x != 0){
+	// // run kernel
+	reduce<<<1, threads>>>(Ne,
+							 no,
+							 mul,
+							 d_sums,
+							 d_sums2);
 
-			checkCUDAError("before reduce");
+	checkCUDAError("reduce");
 
-			// run kernel
-			reduce<<<blocks2, threads>>>(	Ne,
-											no,
-											mul,
-											d_sums, 
-											d_sums2);
-
-			checkCUDAError("reduce");
-
-			// update execution parameters
-			no = blocks2.x;												// get current number of elements
-			if(blocks2.x == 1){
-				blocks2.x = 0;
-			}
-			else{
-				mul = mul * NUMBER_THREADS;									// update the increment
-				blocks_x = blocks2.x/threads.x;								// number of blocks
-				if (blocks2.x % threads.x != 0){							// compensate for division remainder above by adding one grid
-					blocks_x = blocks_x + 1;
-				}
-				blocks2.x = blocks_x;
-				blocks2.y = 1;
-			}
-
-			checkCUDAError("after reduce");
-
+	// return 0;
+	// update execution parameters
+	no = blocks2.x; // get current number of elements
+	if (blocks2.x == 1)
+	{
+		blocks2.x = 0;
+	}
+	else
+	{
+		mul = mul * NUMBER_THREADS;		  // update the increment
+		blocks_x = blocks2.x / threads.x; // number of blocks
+		if (blocks2.x % threads.x != 0)
+		{ // compensate for division remainder above by adding one grid
+			blocks_x = blocks_x + 1;
 		}
-
-		checkCUDAError("before copy sum");
-
-		// copy total sums to device
-		mem_size_single = sizeof(fp) * 1;
-		cudaMemcpy(&total, d_sums, mem_size_single, cudaMemcpyDeviceToHost);
-		cudaMemcpy(&total2, d_sums2, mem_size_single, cudaMemcpyDeviceToHost);
-
-		checkCUDAError("copy sum");
-
-		// calculate statistics
-		meanROI	= total / fp(NeROI);										// gets mean (average) value of element in ROI
-		meanROI2 = meanROI * meanROI;										//
-		varROI = (total2 / fp(NeROI)) - meanROI2;						// gets variance of ROI								
-		q0sqr = varROI / meanROI2;											// gets standard deviation of ROI
-
-		// execute srad kernel
-		srad<<<blocks, threads>>>(	lambda,									// SRAD coefficient 
-									Nr,										// # of rows in input image
-									Nc,										// # of columns in input image
-									Ne,										// # of elements in input image
-									d_iN,									// indices of North surrounding pixels
-									d_iS,									// indices of South surrounding pixels
-									d_jE,									// indices of East surrounding pixels
-									d_jW,									// indices of West surrounding pixels
-									d_dN,									// North derivative
-									d_dS,									// South derivative
-									d_dW,									// West derivative
-									d_dE,									// East derivative
-									q0sqr,									// standard deviation of ROI 
-									d_c,									// diffusion coefficient
-									d_I);									// output image
-
-		checkCUDAError("srad");
-
-		// execute srad2 kernel
-		srad2<<<blocks, threads>>>(	lambda,									// SRAD coefficient 
-									Nr,										// # of rows in input image
-									Nc,										// # of columns in input image
-									Ne,										// # of elements in input image
-									d_iN,									// indices of North surrounding pixels
-									d_iS,									// indices of South surrounding pixels
-									d_jE,									// indices of East surrounding pixels
-									d_jW,									// indices of West surrounding pixels
-									d_dN,									// North derivative
-									d_dS,									// South derivative
-									d_dW,									// West derivative
-									d_dE,									// East derivative
-									d_c,									// diffusion coefficient
-									d_I);									// output image
-
-		checkCUDAError("srad2");
-
+		blocks2.x = blocks_x;
+		blocks2.y = 1;
 	}
 
+	checkCUDAError("after reduce");
+
+	checkCUDAError("before copy sum");
+
+	// copy total sums to device
+	mem_size_single = sizeof(fp) * 1;
+	cudaMemcpy(&total, d_sums, mem_size_single, cudaMemcpyDeviceToHost);
+	cudaMemcpy(&total2, d_sums2, mem_size_single, cudaMemcpyDeviceToHost);
+
+	checkCUDAError("copy sum");
+
+	// calculate statistics
+	meanROI = total / fp(NeROI);			  // gets mean (average) value of element in ROI
+	meanROI2 = meanROI * meanROI;			  //
+	varROI = (total2 / fp(NeROI)) - meanROI2; // gets variance of ROI
+	q0sqr = varROI / meanROI2;				  // gets standard deviation of ROI
+
+	// execute srad kernel
+	srad<<<1, threads>>>(lambda, // SRAD coefficient
+						   Nr,	   // # of rows in input image
+						   Nc,	   // # of columns in input image
+						   Ne,	   // # of elements in input image
+						   d_iN,   // indices of North surrounding pixels
+						   d_iS,   // indices of South surrounding pixels
+						   d_jE,   // indices of East surrounding pixels
+						   d_jW,   // indices of West surrounding pixels
+						   d_dN,   // North derivative
+						   d_dS,   // South derivative
+						   d_dW,   // West derivative
+						   d_dE,   // East derivative
+						   q0sqr,  // standard deviation of ROI
+						   d_c,	   // diffusion coefficient
+						   d_I);   // output image
+
+	checkCUDAError("srad");
+
+	// execute srad2 kernel
+	srad2<<<1, threads>>>(lambda, // SRAD coefficient
+							Nr,		// # of rows in input image
+							Nc,		// # of columns in input image
+							Ne,		// # of elements in input image
+							d_iN,	// indices of North surrounding pixels
+							d_iS,	// indices of South surrounding pixels
+							d_jE,	// indices of East surrounding pixels
+							d_jW,	// indices of West surrounding pixels
+							d_dN,	// North derivative
+							d_dS,	// South derivative
+							d_dW,	// West derivative
+							d_dE,	// East derivative
+							d_c,	// diffusion coefficient
+							d_I);	// output image
+
+	checkCUDAError("srad2");
 	// printf("\n");
 
 	time8 = get_time();
@@ -415,8 +411,8 @@ int main(int argc, char *argv []){
 	// 	SCALE IMAGE UP FROM 0-1 TO 0-255 AND COMPRESS
 	//================================================================================80
 
-	compress<<<blocks, threads>>>(	Ne,
-									d_I);
+	compress<<<1, threads>>>(Ne,
+							   d_I);
 
 	checkCUDAError("compress");
 

@@ -90,6 +90,7 @@ ComputeQ_GPU(int numK, int kGlobalIndex,
 			    ck[kIndex1].Kz * sZ);
     sQr += ck[kIndex1].PhiMag * cos(expArg1);
     sQi += ck[kIndex1].PhiMag * sin(expArg1);
+    break; // L.JEANMOUGIN : TO REMOVE
   }
 
   Qr[xIndex] = sQr;
@@ -104,7 +105,7 @@ void computePhiMag_GPU(int numK, float* phiR_d, float* phiI_d, float* phiMag_d)
   dim3 DimPhiMagBlock(KERNEL_PHI_MAG_THREADS_PER_BLOCK, 1);
   dim3 DimPhiMagGrid(phiMagBlocks, 1);
 
-  ComputePhiMag_GPU <<< DimPhiMagGrid, DimPhiMagBlock >>> 
+  ComputePhiMag_GPU <<< 1, DimPhiMagBlock >>> 
     (phiR_d, phiI_d, phiMag_d, numK);
 }
 
@@ -130,8 +131,9 @@ void computeQ_GPU(int numK, int numX,
 
     cudaMemcpyToSymbol(ck, kValsTile, numElems * sizeof(kValues), 0);
 
-    ComputeQ_GPU <<< DimQGrid, DimQBlock >>>
+    ComputeQ_GPU <<< 1, DimQBlock >>>
       (numK, QGridBase, x_d, y_d, z_d, Qr_d, Qi_d);
+    break; // L.JEANMOUGIN : TO REMOVE
   }
 }
 

@@ -1003,7 +1003,7 @@ int matchSubset(MatchContext* ctx,
 		 
 		 if (alignRC)
 		 {
-			mummergpuRCKernel<<< dimGrid, dimBlock, 0 >>>(ctx->results.d_match_coords,
+			mummergpuRCKernel<<< 1, dimBlock, 0 >>>(ctx->results.d_match_coords,
 													   ctx->queries->d_tex_array,
 													   ctx->queries->d_addrs_tex_array,
 													   ctx->queries->d_lengths_array,
@@ -1012,7 +1012,7 @@ int matchSubset(MatchContext* ctx,
 		 }
 		 else
 		 {
-			mummergpuKernel<<< dimGrid, dimBlock, 0 >>>(ctx->results.d_match_coords,
+			mummergpuKernel<<< 1, dimBlock, 0 >>>(ctx->results.d_match_coords,
 													 ctx->queries->d_tex_array,
 													 ctx->queries->d_addrs_tex_array,
 													 ctx->queries->d_lengths_array,
@@ -1070,7 +1070,7 @@ int matchSubset(MatchContext* ctx,
 		 else
 		 {
 		
-			mummergpuRCKernel<<< dimGrid, dimBlock, 0 >>>(ctx->results.d_match_coords,
+			mummergpuRCKernel<<< 1, dimBlock, 0 >>>(ctx->results.d_match_coords,
 													   ctx->queries->d_tex_array,
 													   ctx->queries->d_addrs_tex_array,
 													   ctx->queries->d_lengths_array,

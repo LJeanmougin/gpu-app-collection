@@ -52,6 +52,7 @@ lud_cuda(float *d_m, int matrix_dim);
 int
 main ( int argc, char *argv[] )
 {
+	 
   printf("WG size of kernel = %d X %d\n", BLOCK_SIZE, BLOCK_SIZE);
 
   int matrix_dim = 32; /* default matrix_dim */

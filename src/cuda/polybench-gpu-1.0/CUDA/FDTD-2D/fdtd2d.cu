@@ -196,11 +196,11 @@ void fdtdCuda(DATA_TYPE* _fict_, DATA_TYPE* ex, DATA_TYPE* ey, DATA_TYPE* hz, DA
 
 	for(int t = 0; t< tmax; t++)
 	{
-		fdtd_step1_kernel<<<grid,block>>>(_fict_gpu, ex_gpu, ey_gpu, hz_gpu, t);
+		fdtd_step1_kernel<<<1,block>>>(_fict_gpu, ex_gpu, ey_gpu, hz_gpu, t);
 		cudaThreadSynchronize();
-		fdtd_step2_kernel<<<grid,block>>>(ex_gpu, ey_gpu, hz_gpu, t);
+		fdtd_step2_kernel<<<1,block>>>(ex_gpu, ey_gpu, hz_gpu, t);
 		cudaThreadSynchronize();
-		fdtd_step3_kernel<<<grid,block>>>(ex_gpu, ey_gpu, hz_gpu, t);
+		fdtd_step3_kernel<<<1,block>>>(ex_gpu, ey_gpu, hz_gpu, t);
 		cudaThreadSynchronize();
 	}
 	

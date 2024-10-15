@@ -85,7 +85,6 @@ main (int argc, char *argv[]) {
   cudaMemcpy(dB, &matBT.front(), B_sz, cudaMemcpyHostToDevice); 
 
   pb_SwitchToTimer( &timers, pb_TimerID_KERNEL );
-
   // Use standard sgemm interface
   regtileSgemm('N', 'T', matArow, matBcol, matAcol, 1.0f, \
       dA, matArow, dB, matBcol, 0.0f, dC, matArow);

@@ -201,19 +201,23 @@ int main(int argc, char** argv)
       num_of_blocks = NUM_SM;
 
     //assume "num_of_blocks" can not be very large
-    dim3  grid( num_of_blocks, 1, 1);
+    // L.JEANMOUGIN : CHANGE FOR 1 BLOCK
+    // dim3  grid( num_of_blocks, 1, 1);
+    dim3 grid(1, 1, 1);
     dim3  threads( num_of_threads_per_block, 1, 1);
 
     if(k%2 == 0){
+    // L.JEANMOUGIN : Will always call the 1 block kernel
       if(num_of_blocks == 1){
-        BFS_in_GPU_kernel<<< grid, threads >>>(d_q1,d_q2, d_graph_nodes, 
+        BFS_in_GPU_kernel<<< 1, threads >>>(d_q1,d_q2, d_graph_nodes, 
             d_graph_edges, d_color, d_cost,num_t , tail,GRAY0,k,d_overflow);
       }
+    // L.JEANMOUGIN : Never going here
       else if(num_of_blocks <= NUM_SM){
         (cudaMemcpy(num_td,&num_t,sizeof(int),
                     cudaMemcpyHostToDevice));
         BFS_kernel_multi_blk_inGPU
-          <<< grid, threads >>>(d_q1,d_q2, d_graph_nodes, 
+          <<< 1, threads >>>(d_q1,d_q2, d_graph_nodes, 
               d_graph_edges, d_color, d_cost, num_td, tail,GRAY0,k,
               switch_kd, max_nodes_per_block_d, global_kt_d,d_overflow);
         (cudaMemcpy(&switch_k,switch_kd, sizeof(int),
@@ -222,21 +226,22 @@ int main(int argc, char** argv)
           k--;
         }
       }
+    // L.JEANMOUGIN : Never going here
       else{
-        BFS_kernel<<< grid, threads >>>(d_q1,d_q2, d_graph_nodes, 
+        BFS_kernel<<< 1, threads >>>(d_q1,d_q2, d_graph_nodes, 
             d_graph_edges, d_color, d_cost, num_t, tail,GRAY0,k,d_overflow);
       }
     }
     else{
       if(num_of_blocks == 1){
-        BFS_in_GPU_kernel<<< grid, threads >>>(d_q2,d_q1, d_graph_nodes, 
+        BFS_in_GPU_kernel<<< 1, threads >>>(d_q2,d_q1, d_graph_nodes, 
             d_graph_edges, d_color, d_cost, num_t, tail,GRAY1,k,d_overflow);
       }
       else if(num_of_blocks <= NUM_SM){
         (cudaMemcpy(num_td,&num_t,sizeof(int),
                     cudaMemcpyHostToDevice));
         BFS_kernel_multi_blk_inGPU
-          <<< grid, threads >>>(d_q2,d_q1, d_graph_nodes, 
+          <<< 1, threads >>>(d_q2,d_q1, d_graph_nodes, 
               d_graph_edges, d_color, d_cost, num_td, tail,GRAY1,k,
               switch_kd, max_nodes_per_block_d, global_kt_d,d_overflow);
         (cudaMemcpy(&switch_k,switch_kd, sizeof(int),
@@ -246,7 +251,7 @@ int main(int argc, char** argv)
         }
       }
       else{
-        BFS_kernel<<< grid, threads >>>(d_q2,d_q1, d_graph_nodes, 
+        BFS_kernel<<< 1, threads >>>(d_q2,d_q1, d_graph_nodes, 
             d_graph_edges, d_color, d_cost, num_t, tail, GRAY1,k,d_overflow);
       }
     }
@@ -256,7 +261,7 @@ int main(int argc, char** argv)
       printf("Error: local queue was overflown. Need to increase W_LOCAL_QUEUE\n");
       return 0;
     }
-  } while(1);
+  } while(0);
   cudaThreadSynchronize();
   pb_SwitchToTimer(&timers, pb_TimerID_COPY);
   printf("GPU kernel done\n");

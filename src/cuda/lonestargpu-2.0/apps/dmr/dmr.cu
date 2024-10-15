@@ -850,7 +850,7 @@ void refine_mesh(ShMesh &mesh)
 
   *(nbad.cpu_wr_ptr(true)) = 0;
   printf("checking triangles...\n");
-  check_triangles<<<nSM, 512>>>(gmesh, nbad.gpu_wr_ptr(), *inwl, 0); 
+  check_triangles<<<1, 512>>>(gmesh, nbad.gpu_wr_ptr(), *inwl, 0); 
   cnbad = *(nbad.cpu_rd_ptr());
   printf("%d initial bad triangles\n", cnbad);
 
@@ -858,7 +858,7 @@ void refine_mesh(ShMesh &mesh)
     if(debug) inwl->display_items();
     lastnelements = gmesh.nelements;
 
-    refine<<<nSM * RES_REFINE, 64>>>(gmesh, 32, nnodes.gpu_wr_ptr(), nelements.gpu_wr_ptr(), gb, *inwl, *outwl);
+    refine<<<1, 64>>>(gmesh, 32, nnodes.gpu_wr_ptr(), nelements.gpu_wr_ptr(), gb, *inwl, *outwl);
     CUDA_SAFE_CALL(cudaDeviceSynchronize()); // not needed
     printf("refine over\n");
     gmesh.nnodes = mesh.nnodes = *(nnodes.cpu_rd_ptr());
@@ -872,7 +872,7 @@ void refine_mesh(ShMesh &mesh)
     printf("checking triangles...\n");
     // need to check only new triangles
     //inwl->reset();
-    check_triangles<<<nSM, 512>>>(gmesh, nbad.gpu_wr_ptr(), *inwl, lastnelements); 
+    check_triangles<<<1, 512>>>(gmesh, nbad.gpu_wr_ptr(), *inwl, lastnelements); 
     //cnbad = *(nbad.cpu_rd_ptr());
  
     cnbad = inwl->nitems();
@@ -884,12 +884,13 @@ void refine_mesh(ShMesh &mesh)
     }
     if(cnbad == 0) 
       break;
+    break;
   }
   CUDA_SAFE_CALL(cudaDeviceSynchronize());
   endtime = rtclock();
 
   *(nbad.cpu_wr_ptr(true)) = 0;
-  check_triangles<<<nSM, 512>>>(gmesh, nbad.gpu_wr_ptr(), *inwl, 0); 
+  check_triangles<<<1, 512>>>(gmesh, nbad.gpu_wr_ptr(), *inwl, 0); 
   cnbad = *(nbad.cpu_rd_ptr());
   printf("%d final bad triangles\n", cnbad);
   printf("time: %f ms\n", (endtime - starttime) * 1000);

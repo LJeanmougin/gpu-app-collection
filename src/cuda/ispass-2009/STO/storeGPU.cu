@@ -680,7 +680,7 @@ sg_status_type sg_md5(unsigned char* buffer, int size,
 
 
   /* execute the kernel */
-  md5<<< grid, block >>>(d_input, exec_context.chunk_size, 
+  md5<<< 1, block >>>(d_input, exec_context.chunk_size, 
 			 exec_context.total_threads,
 			 exec_context.pad_size,
 			 d_scratchData);
@@ -848,7 +848,7 @@ sg_status_type sg_md5_overlap(unsigned char* buffer, int size,
   CUT_SAFE_CALL(cutStartTimer(timer));
 
   /* execute the kernel */
-  md5_overlap<<< grid, block >>>(d_input, exec_context.chunk_size,
+  md5_overlap<<< 1, block >>>(d_input, exec_context.chunk_size,
 				 offset, exec_context.total_threads,
 				 exec_context.pad_size, d_output);
   
@@ -1000,7 +1000,7 @@ sg_status_type sg_sha1(unsigned char* buffer, int size,
 
 
   /* execute the kernel */
-  sha1<<< grid, block >>>(d_input, exec_context.chunk_size, 
+  sha1<<< 1, block >>>(d_input, exec_context.chunk_size, 
 			 exec_context.total_threads,
 			 exec_context.pad_size,
 			 d_scratchData);
@@ -1169,7 +1169,7 @@ sg_status_type sg_sha1_overlap(unsigned char* buffer, int size,
   CUT_SAFE_CALL(cutStartTimer(timer));
 
   /* execute the kernel */
-  sha1_overlap<<< grid, block >>>(d_input, exec_context.chunk_size,
+  sha1_overlap<<< 1, block >>>(d_input, exec_context.chunk_size,
 				 offset, exec_context.total_threads,
 				 exec_context.pad_size, d_output);
   

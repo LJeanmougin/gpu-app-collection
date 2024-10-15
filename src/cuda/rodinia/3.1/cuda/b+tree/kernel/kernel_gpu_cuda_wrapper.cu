@@ -212,7 +212,7 @@ kernel_gpu_cuda_wrapper(record *records,
 	// findK kernel
 	//======================================================================================================================================================150
 
-	findK<<<numBlocks, threadsPerBlock>>>(	maxheight,
+	findK<<<1, threadsPerBlock>>>(	maxheight,
 
 											knodesD,
 											knodes_elem,

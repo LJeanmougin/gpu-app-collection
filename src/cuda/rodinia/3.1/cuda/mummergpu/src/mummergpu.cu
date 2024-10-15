@@ -1392,7 +1392,7 @@ void runPrintKernel(MatchContext* ctx,
     
     fprintf(stderr, "  Calling print kernel... ");
     
-    printKernel <<< dimGrid, dimBlock, 0 >>> (d_matches,
+    printKernel <<< 1, dimBlock, 0 >>> (d_matches,
             numMatches,
             d_alignments,
             
@@ -1945,7 +1945,7 @@ void matchOnGPU(MatchContext* ctx, bool doRC)
 	// Match the reverse complement of the queries to the ref
     if (doRC) {
 		//TODO: GPU RC is disabled
-        mummergpuRCKernel <<< dimGrid, dimBlock, 0 >>> (ctx->results.d_match_coords,
+        mummergpuRCKernel <<< 1, dimBlock, 0 >>> (ctx->results.d_match_coords,
                 ctx->queries->d_tex_array,
                 ctx->queries->d_addrs_tex_array,
                 ctx->queries->d_lengths_array,
@@ -1953,7 +1953,7 @@ void matchOnGPU(MatchContext* ctx, bool doRC)
                 ctx->min_match_length);
     }
     else {
-        mummergpuKernel <<< dimGrid, dimBlock, 0 >>> (ctx->results.d_match_coords,
+        mummergpuKernel <<< 1, dimBlock, 0 >>> (ctx->results.d_match_coords,
 #if COALESCED_QUERIES
                 ctx->results.d_coord_tex_array,
 #endif

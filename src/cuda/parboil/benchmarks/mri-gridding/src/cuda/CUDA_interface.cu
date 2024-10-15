@@ -170,7 +170,8 @@ void CUDA_interface (
   dim3 block1 (BLOCKSIZE);
   dim3 grid1 ((n+BLOCKSIZE-1)/BLOCKSIZE);
 
-  binning_kernel<<<grid1, block1>>>(n, sample_d, idxKey_d, idxValue_d, binCount_d, params.binsize, gridNumElems);
+    // L.Jeanmougin : reducing to 1 block
+  binning_kernel<<<1, block1>>>(n, sample_d, idxKey_d, idxValue_d, binCount_d, params.binsize, gridNumElems);
 
   /* STEP 2: Sort the index-value pair generate in the binning kernel */
 #if USE_CUDPP
@@ -203,7 +204,8 @@ void CUDA_interface (
    * At the end of this step, we copy the start address and list of input elements
    * that will be computed on the CPU.
    */
-  reorder_kernel<<<grid1,block1>>>(n, idxValue_d, sample_d, sortedSampleSoA_d);
+    // L.Jeanmougin : reducing to 1 block
+  reorder_kernel<<<1,block1>>>(n, idxValue_d, sample_d, sortedSampleSoA_d);
 
   pb_SwitchToTimer(timers, pb_TimerID_COPY);
 
@@ -264,7 +266,8 @@ void CUDA_interface (
   dim3 block2 (dims.x,dims.y,dims.z);
   dim3 grid2 (size_x/dims.x, (size_y*size_z)/(4*dims.y*dims.z));
 
-  gridding_GPU<<<grid2, block2>>>(sortedSampleSoA_d, binStartAddr_d, gridData_d, sampleDensity_d, beta);
+    // L.Jeanmougin : reducing to 1 block
+  gridding_GPU<<<1, block2>>>(sortedSampleSoA_d, binStartAddr_d, gridData_d, sampleDensity_d, beta);
 
   pb_SwitchToTimer(timers, pb_TimerID_COMPUTE);
 

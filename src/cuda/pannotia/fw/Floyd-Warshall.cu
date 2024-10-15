@@ -172,7 +172,7 @@ int main(int argc, char **argv)
     double timer3 = gettime();
     // Main computation loop
     for (int k = 1; k < dim && k < MAX_ITERS; k++) {
-        floydwarshall <<<grid, threads>>>(dist_d, next_d, dim, k);
+        floydwarshall <<<1, threads>>>(dist_d, next_d, dim, k);
     }
     cudaThreadSynchronize();
 
