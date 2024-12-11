@@ -70,7 +70,7 @@ endif
 
 
 # Compilers
-NVCC       := $(CUDA_INSTALL_PATH)/bin/nvcc 
+NVCC       := $(CUDA_INSTALL_PATH)/bin/nvcc
 CXX        := g++ -fPIC
 CC         := gcc -fPIC
 LINK       := g++ -fPIC

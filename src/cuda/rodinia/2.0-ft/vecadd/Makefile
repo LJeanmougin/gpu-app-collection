@@ -37,10 +37,10 @@
 EXECUTABLE	:= vecadd-rodinia-2.0-ft
 # CUDA source files (compiled with cudacc)
 CUFILES		:= vecadd.cu
-# CUDA dependency files
-CU_DEPS		:=
 # C/C++ source files (compiled with gcc / c++)
 CFILES		:=
+
+GPGPUSIM_ROOT  ?= ../../..
 
 OMIT_CUTIL_LIB=1
 OMIT_SHRUTIL_LIB=1
