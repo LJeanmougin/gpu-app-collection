@@ -210,8 +210,9 @@ int main(int argc, char* argv[])
 		dim3 dimGrid( (REC_WINDOW/dimBlock.x) + (!(REC_WINDOW%dimBlock.x)?0:1) );
 
 		//Add a and b, store in c
-		// CHANGING BLOCK COUNT TO 1
-		euclid<<<1,dimBlock>>>(data, x2, y2, z_d, REC_WINDOW, REC_LENGTH, LATITUDE_POS);
+		// L.Jeanmougin : 1 Block 32 Threads
+		// euclid<<<1,dimBlock>>>(data, x2, y2, z_d, REC_WINDOW, REC_LENGTH, LATITUDE_POS);
+		euclid<<<1, 32>>>(data, x2, y2, z_d, REC_WINDOW, REC_LENGTH, LATITUDE_POS);
 		cudaThreadSynchronize();
 		
 		//Copy data from device memory to host memory

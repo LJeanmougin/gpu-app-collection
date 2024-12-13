@@ -152,12 +152,17 @@ void lud_cuda(float *m, int matrix_dim)
   float *m_debug = (float*)malloc(matrix_dim*matrix_dim*sizeof(float));
 
   for (i=0; i < matrix_dim-BLOCK_SIZE; i += BLOCK_SIZE) {
-      lud_diagonal<<<1, BLOCK_SIZE>>>(m, matrix_dim, i);
+      // L.Jeanmougin : 1 Block 32 Warps
+      // lud_diagonal<<<1, BLOCK_SIZE>>>(m, matrix_dim, i);
+      lud_diagonal<<<1, 32>>>(m, matrix_dim, i);
       // Limiting block count to 1
-      lud_perimeter<<<1 /*(matrix_dim-i)/BLOCK_SIZE-1*/, BLOCK_SIZE*2>>>(m, matrix_dim, i);
+      // lud_perimeter<<<1 /*(matrix_dim-i)/BLOCK_SIZE-1*/, BLOCK_SIZE*2>>>(m, matrix_dim, i);
+      lud_perimeter<<<1 /*(matrix_dim-i)/BLOCK_SIZE-1*/, 32>>>(m, matrix_dim, i);
       dim3 dimGrid((matrix_dim-i)/BLOCK_SIZE-1, (matrix_dim-i)/BLOCK_SIZE-1);
-      lud_internal<<<1 /* dimGrid */, dimBlock>>>(m, matrix_dim, i); 
+      // lud_internal<<<1 /* dimGrid */, dimBlock>>>(m, matrix_dim, i); 
+      lud_internal<<<1 /* dimGrid */, 32>>>(m, matrix_dim, i); 
   }
-  lud_diagonal<<<1,BLOCK_SIZE>>>(m, matrix_dim, i);
+  // lud_diagonal<<<1,BLOCK_SIZE>>>(m, matrix_dim, i);
+  lud_diagonal<<<1,32>>>(m, matrix_dim, i);
 }
 

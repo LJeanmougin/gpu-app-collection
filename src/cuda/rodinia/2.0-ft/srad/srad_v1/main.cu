@@ -289,8 +289,10 @@ int main(int argc, char *argv []){
 	//================================================================================80
 
 		// CHANGING NUMBER OF BLOCKS TO 1
-	extract<<<1, threads>>>(	Ne,
-									d_I);
+		// L.Jeanmougin : 1 block 32 threads
+	// extract<<<1, threads>>>(	Ne,
+	extract<<<1, 32>>>(Ne,
+					   d_I);
 
 	checkCUDAError("extract");
 
@@ -310,26 +312,31 @@ int main(int argc, char *argv []){
 
 		// execute square kernel
 		// CHANGING NUMBER OF BLOCKS TO 1
-		prepare<<<1, threads>>>(	Ne,
-										d_I,
-										d_sums,
-										d_sums2);
+		// L.Jeanmougin : 1 block 32 threads
+		// prepare<<<1, threads>>>(	Ne,
+		prepare<<<1, 32>>>(Ne,
+						d_I,
+						d_sums,
+						d_sums2);
 
-		checkCUDAError("prepare");
+	checkCUDAError("prepare");
 
-		// performs subsequent reductions of sums
-		blocks2.x = blocks.x;												// original number of blocks
-		blocks2.y = blocks.y;												
-		no = Ne;														// original number of sum elements
-		mul = 1;														// original multiplier
+	// performs subsequent reductions of sums
+	blocks2.x = blocks.x; // original number of blocks
+	blocks2.y = blocks.y;
+	no = Ne; // original number of sum elements
+	mul = 1; // original multiplier
 
-		while(blocks2.x != 0){
+	while (blocks2.x != 0)
+	{
 
-			checkCUDAError("before reduce");
+		checkCUDAError("before reduce");
 
-			// run kernel
+		// run kernel
 		// CHANGING NUMBER OF BLOCKS TO 1
-			reduce<<<1, threads>>>(	Ne,
+		// L.Jeanmougin : 1 block 32 threads
+			// reduce<<<1, threads>>>(	Ne,
+			reduce<<<1, 32>>>(	Ne,
 											no,
 											mul,
 											d_sums, 
@@ -373,7 +380,9 @@ int main(int argc, char *argv []){
 
 		// execute srad kernel
 		// CHANGING NUMBER OF BLOCKS TO 1
-		srad<<<1, threads>>>(	lambda,									// SRAD coefficient 
+		// L.Jeanmougin : 1 block 32 threads
+		// srad<<<1, threads>>>(	lambda,									// SRAD coefficient 
+		srad<<<1, 32>>>(	lambda,									// SRAD coefficient 
 									Nr,										// # of rows in input image
 									Nc,										// # of columns in input image
 									Ne,										// # of elements in input image
@@ -392,7 +401,9 @@ int main(int argc, char *argv []){
 		checkCUDAError("srad");
 
 		// execute srad2 kernel
-		srad2<<<1, threads>>>(	lambda,									// SRAD coefficient 
+		// L.Jeanmougin : 1 block 32 threads
+		// srad2<<<1, threads>>>(	lambda,									// SRAD coefficient 
+		srad2<<<1, 32>>>(	lambda,									// SRAD coefficient 
 									Nr,										// # of rows in input image
 									Nc,										// # of columns in input image
 									Ne,										// # of elements in input image
@@ -419,7 +430,9 @@ int main(int argc, char *argv []){
 	// 	SCALE IMAGE UP FROM 0-1 TO 0-255 AND COMPRESS
 	//================================================================================80
 
-	compress<<<1, threads>>>(	Ne,
+	// L.Jeanmougin : 1 Block 32 Threads
+	// compress<<<1, threads>>>(	Ne,
+	compress<<<1, 32>>>(	Ne,
 									d_I);
 
 	checkCUDAError("compress");

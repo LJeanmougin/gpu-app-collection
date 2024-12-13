@@ -32,8 +32,11 @@
 
 using namespace std;
 
-#define THREADS_PER_BLOCK 512
-#define MAXBLOCKS 65536
+// L.Jeanmougin : 1 warp, 1 block
+// #define THREADS_PER_BLOCK 512
+// #define MAXBLOCKS 65536
+#define THREADS_PER_BLOCK 32
+#define MAXBLOCKS 1
 #define PROFILE
 
 /* host memory analogous to device memory */
