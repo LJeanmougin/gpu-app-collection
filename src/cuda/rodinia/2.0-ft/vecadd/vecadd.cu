@@ -6,7 +6,8 @@
 __global__ void vecaddKernel(int *v1_in, int *v2_in, int *v_out, int size)
 {
     int idx = blockDim.x * blockIdx.x + threadIdx.x;
-    v_out[idx] = v1_in[idx] + v2_in[idx];
+    if (idx < size)
+        v_out[idx] = v1_in[idx] + v2_in[idx];
 }
 
 int main()
