@@ -143,7 +143,8 @@ void histogram1024GPU(
     int dataN)
 {
     ( cudaMemset(d_Result1024, 0, HISTOGRAM_SIZE) );
-    histogram1024Kernel<<<1, THREAD_N>>>(
+    // histogram1024Kernel<<<1, THREAD_N>>>(
+    histogram1024Kernel<<<1, 32>>>(
         d_Result1024,
         d_Data,
 		minimum,

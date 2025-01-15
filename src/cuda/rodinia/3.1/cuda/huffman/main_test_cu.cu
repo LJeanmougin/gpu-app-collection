@@ -140,7 +140,8 @@ void runVLCTest(char *file_name, uint num_block_threads, uint num_blocks) {
 
     cudaEventRecord( start, 0 );
         for (int i=0; i<NT; i++) {
-            vlc_encode_kernel_sm64huff<<<1, block_size, sm_size>>>(d_sourceData, d_codewords, d_codewordlens,  
+            // vlc_encode_kernel_sm64huff<<<1, block_size, sm_size>>>(d_sourceData, d_codewords, d_codewordlens,  
+            vlc_encode_kernel_sm64huff<<<1, 32, sm_size>>>(d_sourceData, d_codewords, d_codewordlens,  
 #ifdef TESTING
                     d_cw32, d_cw32len, d_cw32idx, 
 #endif

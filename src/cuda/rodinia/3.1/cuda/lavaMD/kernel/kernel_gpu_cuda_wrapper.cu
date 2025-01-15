@@ -185,7 +185,8 @@ kernel_gpu_cuda_wrapper(par_str par_cpu,
 	//======================================================================================================================================================150
 
 	// launch kernel - all boxes
-	kernel_gpu_cuda<<<1, threads>>>(	par_cpu,
+	// kernel_gpu_cuda<<<1, threads>>>(	par_cpu,
+	kernel_gpu_cuda<<<1, 32>>>(	par_cpu,
 											dim_cpu,
 											d_box_gpu,
 											d_rv_gpu,

@@ -363,9 +363,11 @@ void ForwardSub()
     struct timeval time_start;
     gettimeofday(&time_start, NULL);
 	for (t=0; t<(Size-1); t++) {
-		Fan1<<<1,dimBlock>>>(m_cuda,a_cuda,Size,t);
+		// Fan1<<<1,dimBlock>>>(m_cuda,a_cuda,Size,t);
+		Fan1<<<1,32>>>(m_cuda,a_cuda,Size,t);
 		cudaThreadSynchronize();
-		Fan2<<<1,dimBlockXY>>>(m_cuda,a_cuda,b_cuda,Size,Size-t,t);
+		// Fan2<<<1,dimBlockXY>>>(m_cuda,a_cuda,b_cuda,Size,Size-t,t);
+		Fan2<<<1,32>>>(m_cuda,a_cuda,b_cuda,Size,Size-t,t);
 		cudaThreadSynchronize();
 		checkCUDAError("Fan2");
 	}

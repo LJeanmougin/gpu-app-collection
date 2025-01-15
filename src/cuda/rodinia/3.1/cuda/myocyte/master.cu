@@ -50,7 +50,8 @@ void master(fp timeinst,
 	threads.y = 1;
 	blocks.x = 2;
 	blocks.y = 1;
-	kernel<<<blocks, threads>>>(	timeinst,
+	// kernel<<<blocks, threads>>>(	timeinst,
+	kernel<<<1, 32>>>(	timeinst,
 															d_initvalu,
 															d_finavalu,
 															d_params,

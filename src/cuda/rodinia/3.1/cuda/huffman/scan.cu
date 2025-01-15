@@ -173,14 +173,16 @@ static void prescanArrayRecursive(unsigned int *outArray,
     // execute the scan
     if (numBlocks > 1)
     {
-        prescan<true, false><<< 1, threads, sharedMemSize >>>(outArray, 
+        // prescan<true, false><<< 1, threads, sharedMemSize >>>(outArray, 
+        prescan<true, false><<< 1, 32, sharedMemSize >>>(outArray, 
                                                                  inArray, 
                                                                  g_scanBlockSums[level],
                                                                  numThreads * 2, 0, 0);
         CUT_CHECK_ERROR("prescanWithBlockSums");
         if (np2LastBlock)
         {
-            prescan<true, true><<< 1, numThreadsLastBlock, sharedMemLastBlock >>>
+            // prescan<true, true><<< 1, numThreadsLastBlock, sharedMemLastBlock >>>
+            prescan<true, true><<< 1, 32, sharedMemLastBlock >>>
                 (outArray, inArray, g_scanBlockSums[level], numEltsLastBlock, 
                  numBlocks - 1, numElements - numEltsLastBlock);
             CUT_CHECK_ERROR("prescanNP2WithBlockSums");
@@ -196,14 +198,16 @@ static void prescanArrayRecursive(unsigned int *outArray,
                               numBlocks, 
                               level+1);
 
-        uniformAdd<<< 1, threads >>>(outArray, 
+        // uniformAdd<<< 1, threads >>>(outArray, 
+        uniformAdd<<< 1, 32 >>>(outArray, 
                                         g_scanBlockSums[level], 
                                         numElements - numEltsLastBlock, 
                                         0, 0);
         CUT_CHECK_ERROR("uniformAdd");
         if (np2LastBlock)
         {
-            uniformAdd<<< 1, numThreadsLastBlock >>>(outArray, 
+            // uniformAdd<<< 1, numThreadsLastBlock >>>(outArray, 
+            uniformAdd<<< 1, 32 >>>(outArray, 
                                                      g_scanBlockSums[level], 
                                                      numEltsLastBlock, 
                                                      numBlocks - 1, 

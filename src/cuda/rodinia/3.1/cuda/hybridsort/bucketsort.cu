@@ -114,7 +114,8 @@ void bucketSort(float *d_input, float *d_output, int listsize,
 	int blocks = ((listsize - 1) / (threads.x * BUCKET_BAND)) + 1; 
     dim3 grid(blocks, 1);
 	// Find the new indice for all elements
-	bucketcount <<< 1, threads >>>(d_input, d_indice, d_prefixoffsets, listsize);
+	// bucketcount <<< 1, threads >>>(d_input, d_indice, d_prefixoffsets, listsize);
+	bucketcount <<< 1, 32 >>>(d_input, d_indice, d_prefixoffsets, listsize);
 	///////////////////////////////////////////////////////////////////////////
 	// Prefix scan offsets and align each division to float4 (required by 
 	// mergesort)
@@ -125,7 +126,8 @@ threads.x = BUCKET_WG_SIZE_0;
 	threads.x = 128;  
 #endif
 	grid.x = DIVISIONS / threads.x; 
-	bucketprefixoffset <<< 1, threads >>>(d_prefixoffsets, d_offsets, blocks); 	
+	// bucketprefixoffset <<< 1, threads >>>(d_prefixoffsets, d_offsets, blocks); 	
+	bucketprefixoffset <<< 1, 32 >>>(d_prefixoffsets, d_offsets, blocks); 	
 
 	// copy the sizes from device to host
 	cudaMemcpy(h_offsets, d_offsets, DIVISIONS * sizeof(int), cudaMemcpyDeviceToHost);
@@ -153,7 +155,8 @@ threads.x = BUCKET_WG_SIZE_0;
     threads.x = BUCKET_THREAD_N; 
 	blocks = ((listsize - 1) / (threads.x * BUCKET_BAND)) + 1; 
     grid.x = blocks; 
-	bucketsort <<< 1, threads >>>(d_input, d_indice, d_output, listsize, d_prefixoffsets, l_offsets);
+	// bucketsort <<< 1, threads >>>(d_input, d_indice, d_output, listsize, d_prefixoffsets, l_offsets);
+	bucketsort <<< 1, 32 >>>(d_input, d_indice, d_output, listsize, d_prefixoffsets, l_offsets);
 }
 
 
