@@ -209,7 +209,8 @@ int main(int argc, char** argv)
     if(k%2 == 0){
     // L.JEANMOUGIN : Will always call the 1 block kernel
       if(num_of_blocks == 1){
-        BFS_in_GPU_kernel<<< 1, threads >>>(d_q1,d_q2, d_graph_nodes, 
+        // BFS_in_GPU_kernel<<< 1, threads >>>(d_q1,d_q2, d_graph_nodes, 
+        BFS_in_GPU_kernel<<< 1, 32 >>>(d_q1,d_q2, d_graph_nodes, 
             d_graph_edges, d_color, d_cost,num_t , tail,GRAY0,k,d_overflow);
       }
     // L.JEANMOUGIN : Never going here
@@ -217,7 +218,8 @@ int main(int argc, char** argv)
         (cudaMemcpy(num_td,&num_t,sizeof(int),
                     cudaMemcpyHostToDevice));
         BFS_kernel_multi_blk_inGPU
-          <<< 1, threads >>>(d_q1,d_q2, d_graph_nodes, 
+          // <<< 1, threads >>>(d_q1,d_q2, d_graph_nodes,
+          <<< 1, 32 >>>(d_q1,d_q2, d_graph_nodes, 
               d_graph_edges, d_color, d_cost, num_td, tail,GRAY0,k,
               switch_kd, max_nodes_per_block_d, global_kt_d,d_overflow);
         (cudaMemcpy(&switch_k,switch_kd, sizeof(int),
@@ -228,20 +230,23 @@ int main(int argc, char** argv)
       }
     // L.JEANMOUGIN : Never going here
       else{
-        BFS_kernel<<< 1, threads >>>(d_q1,d_q2, d_graph_nodes, 
+        // BFS_kernel<<< 1, threads >>>(d_q1,d_q2, d_graph_nodes, 
+        BFS_kernel<<< 1, 32 >>>(d_q1,d_q2, d_graph_nodes, 
             d_graph_edges, d_color, d_cost, num_t, tail,GRAY0,k,d_overflow);
       }
     }
     else{
       if(num_of_blocks == 1){
-        BFS_in_GPU_kernel<<< 1, threads >>>(d_q2,d_q1, d_graph_nodes, 
+        // BFS_in_GPU_kernel<<< 1, threads >>>(d_q2,d_q1, d_graph_nodes, 
+        BFS_in_GPU_kernel<<< 1, 32 >>>(d_q2,d_q1, d_graph_nodes, 
             d_graph_edges, d_color, d_cost, num_t, tail,GRAY1,k,d_overflow);
       }
       else if(num_of_blocks <= NUM_SM){
         (cudaMemcpy(num_td,&num_t,sizeof(int),
                     cudaMemcpyHostToDevice));
         BFS_kernel_multi_blk_inGPU
-          <<< 1, threads >>>(d_q2,d_q1, d_graph_nodes, 
+          // <<< 1, threads >>>(d_q2,d_q1, d_graph_nodes,
+          <<< 1, 32 >>>(d_q2,d_q1, d_graph_nodes, 
               d_graph_edges, d_color, d_cost, num_td, tail,GRAY1,k,
               switch_kd, max_nodes_per_block_d, global_kt_d,d_overflow);
         (cudaMemcpy(&switch_k,switch_kd, sizeof(int),
@@ -251,7 +256,8 @@ int main(int argc, char** argv)
         }
       }
       else{
-        BFS_kernel<<< 1, threads >>>(d_q2,d_q1, d_graph_nodes, 
+        // BFS_kernel<<< 1, threads >>>(d_q2,d_q1, d_graph_nodes,
+        BFS_kernel<<< 1, 32 >>>(d_q2,d_q1, d_graph_nodes, 
             d_graph_edges, d_color, d_cost, num_t, tail, GRAY1,k,d_overflow);
       }
     }

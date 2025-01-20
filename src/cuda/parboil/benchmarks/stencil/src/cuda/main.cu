@@ -124,7 +124,8 @@ int main(int argc, char** argv) {
 	pb_SwitchToTimer(&timers, pb_TimerID_KERNEL);
 	for(int t=0;t<iteration;t++)
 	{
-		block2D_hybrid_coarsen_x<<<1, block,sh_size>>>(c0,c1, d_A0, d_Anext, nx, ny,  nz);
+		// block2D_hybrid_coarsen_x<<<1, block,sh_size>>>(c0,c1, d_A0, d_Anext, nx, ny,  nz);
+		block2D_hybrid_coarsen_x<<<1, 32,sh_size>>>(c0,c1, d_A0, d_Anext, nx, ny,  nz);
     float *d_temp = d_A0;
     d_A0 = d_Anext;
     d_Anext = d_temp;

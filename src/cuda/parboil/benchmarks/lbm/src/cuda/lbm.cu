@@ -43,7 +43,8 @@ void CUDA_LBM_performStreamCollide( LBM_Grid srcGrid, LBM_Grid dstGrid ) {
 	dimBlock.y = dimBlock.z = dimGrid.z = 1;
 
     // L.Jeanmougin : reducing to 1 block
-	performStreamCollide_kernel<<<1, dimBlock>>>(srcGrid, dstGrid);
+	// performStreamCollide_kernel<<<1, dimBlock>>>(srcGrid, dstGrid);
+	performStreamCollide_kernel<<<1, 32>>>(srcGrid, dstGrid);
   CUDA_ERRCK;
 }
 

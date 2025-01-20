@@ -157,7 +157,8 @@ int main(int argc, char* argv[]) {
     
     pb_SwitchToSubTimer(&timers, prescans , pb_TimerID_KERNEL);
     // L.Jeanmougin : reducing to 1 block
-    histo_prescan_kernel<<<1,dim3(PRESCAN_THREADS)>>>((unsigned int*)input, img_height*img_width, ranges);
+    // histo_prescan_kernel<<<1,dim3(PRESCAN_THREADS)>>>((unsigned int*)input, img_height*img_width, ranges);
+    histo_prescan_kernel<<<1,32>>>((unsigned int*)input, img_height*img_width, ranges);
     
     pb_SwitchToSubTimer(&timers, postpremems , pb_TimerID_KERNEL);
 
@@ -168,7 +169,8 @@ int main(int argc, char* argv[]) {
     pb_SwitchToSubTimer(&timers, intermediates, pb_TimerID_KERNEL);
 
     // L.Jeanmougin : reducing to 1 block
-    histo_intermediates_kernel<<<1, dim3((img_width+1)/2)>>>(
+    // histo_intermediates_kernel<<<1, dim3((img_width+1)/2)>>>(
+    histo_intermediates_kernel<<<1, 32>>>(
                 (uint2*)(input),
                 (unsigned int)img_height,
                 (unsigned int)img_width,
@@ -180,7 +182,8 @@ int main(int argc, char* argv[]) {
     
     
     // L.Jeanmougin : reducing to 1 block
-    histo_main_kernel<<<1, dim3(THREADS)>>>(
+    // histo_main_kernel<<<1, dim3(THREADS)>>>(
+    histo_main_kernel<<<1, 32>>>(
                 (uchar4*)(sm_mappings),
                 img_height*img_width,
                 ranges_h[0], ranges_h[1],
@@ -193,7 +196,8 @@ int main(int argc, char* argv[]) {
     pb_SwitchToSubTimer(&timers, finals, pb_TimerID_KERNEL);
     
     // L.Jeanmougin : reducing to 1 block
-    histo_final_kernel<<<1, dim3(512)>>>(
+    // histo_final_kernel<<<1, dim3(512)>>>(
+    histo_final_kernel<<<1, 32>>>(
                 ranges_h[0], ranges_h[1],
                 histo_height, histo_width,
                 (unsigned int*)(global_subhisto),

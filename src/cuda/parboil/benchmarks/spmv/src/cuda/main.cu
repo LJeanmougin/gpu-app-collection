@@ -134,7 +134,8 @@ int main(int argc, char** argv) {
 	//main execution
 	pb_SwitchToTimer(&timers, pb_TimerID_KERNEL);
 	for (int i= 0; i<50; i++)
-	spmv_jds<<<1, block>>>(d_Ax_vector,
+	// spmv_jds<<<1, block>>>(d_Ax_vector,
+	spmv_jds<<<1, 32>>>(d_Ax_vector,
   				d_data,d_indices,d_perm,
 				d_x_vector,d_nzcnt,dim);
 							

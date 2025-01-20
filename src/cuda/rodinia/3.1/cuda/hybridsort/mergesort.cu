@@ -88,7 +88,8 @@ float4* runMergeSort(int listsize, int divisions,
 		mergeSortPass <<< 1, 32 >>>(d_resultList, nrElems, threadsPerDiv); 
 		nrElems *= 2; 
 		floatsperthread = (nrElems*4); 
-		if(threadsPerDiv == 1) break; 
+		// if(threadsPerDiv == 1) break; 
+		break;
 	}
 	////////////////////////////////////////////////////////////////////////////
 	// Now, get rid of the NULL elements
