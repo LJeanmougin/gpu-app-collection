@@ -589,8 +589,8 @@ int main(int argc, char *argv []){
 
 		// launch GPU kernel
 		// L.Jeanmougin : 1 Block 32 Threads
-		// kernel<<<blocks, threads>>>();
-		kernel<<<1, 32>>>();
+		kernel<<<1, threads>>>();
+		// kernel<<<1, 32>>>();
 
 		// free frame after each loop iteration, since AVI library allocates memory for every frame fetched
 		free(frame);

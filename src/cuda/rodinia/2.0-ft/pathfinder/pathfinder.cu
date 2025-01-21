@@ -195,8 +195,8 @@ int calc_path(int *gpuWall, int *gpuResult[2], int rows, int cols, \
             dst = temp;
 		// CHANGING NUMBER OF BLOCKS TO 1
             // L.Jeanmougin : 1 Block 32 Threads
-            // dynproc_kernel<<<1, dimBlock>>>(
-            dynproc_kernel<<<1, 32>>>(
+            // dynproc_kernel<<<1, 32>>>(
+            dynproc_kernel<<<1, dimBlock>>>(
                 MIN(pyramid_height, rows-t-1), 
                 gpuWall, gpuResult[src], gpuResult[dst],
                 cols,rows, t, borderCols);

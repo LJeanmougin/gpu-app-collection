@@ -122,8 +122,8 @@ void bpnn_train_cuda(BPNN *net, float *eo, float *eh)
 
   
   // L.Jeanmougin : 1 Bloc 32 Threads
-  // bpnn_layerforward_CUDA<<< grid, threads >>>(input_cuda,
-	bpnn_layerforward_CUDA<<< 1, 32 >>>(input_cuda,
+  bpnn_layerforward_CUDA<<< grid, threads >>>(input_cuda,
+	// bpnn_layerforward_CUDA<<< 1, 32 >>>(input_cuda,
 	                                          output_hidden_cuda,
 											  input_hidden_cuda,
 											  hidden_partial_sum,
@@ -172,8 +172,8 @@ void bpnn_train_cuda(BPNN *net, float *eo, float *eh)
   cudaMemcpy(input_hidden_cuda, input_weights_one_dim, (in + 1) * (hid + 1) * sizeof(float), cudaMemcpyHostToDevice);
 
   // L.Jeanmougin : 1 Bloc 32 Threads
-  // bpnn_adjust_weights_cuda<<< grid, threads >>>(hidden_delta_cuda,  
-	bpnn_adjust_weights_cuda<<< 1, 32 >>>(hidden_delta_cuda,  
+  bpnn_adjust_weights_cuda<<< 1, threads >>>(hidden_delta_cuda,  
+	// bpnn_adjust_weights_cuda<<< 1, 32 >>>(hidden_delta_cuda,  
 												hid, 
 												input_cuda, 
 												in,

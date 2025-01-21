@@ -230,8 +230,8 @@ void compute_tran_temp(float *MatrixPower,float *MatrixTemp, int col, int row, \
 
 	for (t = 0; t < total_iterations; t+=num_iterations) {
         // L.Jeanmougin : 1 Block 32 Threads
-	// calculate_temp<<<dimGrid, dimBlock>>>(MIN(num_iterations, total_iterations-t), MatrixPower,MatrixTemp,
-	    calculate_temp<<<1, 32>>>(MIN(num_iterations, total_iterations-t), MatrixPower,MatrixTemp,\
+	calculate_temp<<<1, dimBlock>>>(MIN(num_iterations, total_iterations-t), MatrixPower,MatrixTemp,
+	    // calculate_temp<<<1, 32>>>(MIN(num_iterations, total_iterations-t), MatrixPower,MatrixTemp,\
 		col,row,borderCols, borderRows, Cap,Rx,Ry,Rz,step,time_elapsed);
 	}
 }

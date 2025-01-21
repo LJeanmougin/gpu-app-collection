@@ -290,8 +290,8 @@ int main(int argc, char *argv []){
 
 		// CHANGING NUMBER OF BLOCKS TO 1
 		// L.Jeanmougin : 1 block 32 threads
-	// extract<<<1, threads>>>(	Ne,
-	extract<<<1, 32>>>(Ne,
+	// extract<<<1, 32>>>(Ne,
+	extract<<<1, threads>>>(	Ne,
 					   d_I);
 
 	checkCUDAError("extract");
@@ -313,8 +313,8 @@ int main(int argc, char *argv []){
 		// execute square kernel
 		// CHANGING NUMBER OF BLOCKS TO 1
 		// L.Jeanmougin : 1 block 32 threads
-		// prepare<<<1, threads>>>(	Ne,
-		prepare<<<1, 32>>>(Ne,
+		// prepare<<<1, 32>>>(Ne,
+		prepare<<<1, threads>>>(	Ne,
 						d_I,
 						d_sums,
 						d_sums2);
@@ -335,8 +335,8 @@ int main(int argc, char *argv []){
 		// run kernel
 		// CHANGING NUMBER OF BLOCKS TO 1
 		// L.Jeanmougin : 1 block 32 threads
-			// reduce<<<1, threads>>>(	Ne,
-			reduce<<<1, 32>>>(	Ne,
+			// reduce<<<1, 32>>>(	Ne,
+			reduce<<<1, threads>>>(	Ne,
 											no,
 											mul,
 											d_sums, 
@@ -381,8 +381,8 @@ int main(int argc, char *argv []){
 		// execute srad kernel
 		// CHANGING NUMBER OF BLOCKS TO 1
 		// L.Jeanmougin : 1 block 32 threads
-		// srad<<<1, threads>>>(	lambda,									// SRAD coefficient 
-		srad<<<1, 32>>>(	lambda,									// SRAD coefficient 
+		// srad<<<1, 32>>>(	lambda,									// SRAD coefficient 
+		srad<<<1, threads>>>(	lambda,									// SRAD coefficient 
 									Nr,										// # of rows in input image
 									Nc,										// # of columns in input image
 									Ne,										// # of elements in input image
@@ -402,8 +402,8 @@ int main(int argc, char *argv []){
 
 		// execute srad2 kernel
 		// L.Jeanmougin : 1 block 32 threads
-		// srad2<<<1, threads>>>(	lambda,									// SRAD coefficient 
-		srad2<<<1, 32>>>(	lambda,									// SRAD coefficient 
+		// srad2<<<1, 32>>>(	lambda,									// SRAD coefficient 
+		srad2<<<1, threads>>>(	lambda,									// SRAD coefficient 
 									Nr,										// # of rows in input image
 									Nc,										// # of columns in input image
 									Ne,										// # of elements in input image
@@ -431,8 +431,8 @@ int main(int argc, char *argv []){
 	//================================================================================80
 
 	// L.Jeanmougin : 1 Block 32 Threads
-	// compress<<<1, threads>>>(	Ne,
-	compress<<<1, 32>>>(	Ne,
+	// compress<<<1, 32>>>(	Ne,
+	compress<<<1, threads>>>(	Ne,
 									d_I);
 
 	checkCUDAError("compress");

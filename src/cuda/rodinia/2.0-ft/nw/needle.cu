@@ -154,8 +154,8 @@ void runTest( int argc, char** argv)
 		dimGrid.x = i;
 		dimGrid.y = 1;
 		// L.Jeanmougin : 1 Block 32 Threads
-		// needle_cuda_shared_1<<<1, dimBlock>>>(referrence_cuda, matrix_cuda, matrix_cuda_out
-		needle_cuda_shared_1<<<1, 32>>>(referrence_cuda, matrix_cuda, matrix_cuda_out
+		needle_cuda_shared_1<<<1, dimBlock>>>(referrence_cuda, matrix_cuda, matrix_cuda_out
+		// needle_cuda_shared_1<<<1, 32>>>(referrence_cuda, matrix_cuda, matrix_cuda_out
 		                                      ,max_cols, penalty, i, block_width); 
 	}
 	printf("Processing bottom-right matrix\n");
@@ -164,7 +164,8 @@ void runTest( int argc, char** argv)
 		dimGrid.x = i;
 		dimGrid.y = 1;
 		// L.Jeanmougin : 1 Block 32 Threads
-		needle_cuda_shared_2<<<1, 32>>>(referrence_cuda, matrix_cuda, matrix_cuda_out
+		// needle_cuda_shared_2<<<1, 32>>>(referrence_cuda, matrix_cuda, matrix_cuda_out
+		needle_cuda_shared_2<<<1, dimBlock>>>(referrence_cuda, matrix_cuda, matrix_cuda_out
 		                                      ,max_cols, penalty, i, block_width); 
 	}
 

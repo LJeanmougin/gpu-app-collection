@@ -35,7 +35,7 @@ using namespace std;
 // L.Jeanmougin : 1 warp, 1 block
 // #define THREADS_PER_BLOCK 512
 // #define MAXBLOCKS 65536
-#define THREADS_PER_BLOCK 32
+#define THREADS_PER_BLOCK 512
 #define MAXBLOCKS 1
 #define PROFILE
 

@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#define BSIZE 32
+#define BSIZE 128
 #define NUMBLOCK 1
 
 __global__ void vecaddKernel(int *v1_in, int *v2_in, int *v3_in, int *v_out, int size, int variable)
