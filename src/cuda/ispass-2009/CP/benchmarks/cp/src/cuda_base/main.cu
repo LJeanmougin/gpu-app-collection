@@ -184,7 +184,7 @@ int main(int argc, char** argv) {
  
       // RUN the kernel...
       pb_StartTimer(&timers.gpu);
-      cenergy<<<1, Bsz, 0>>>(runatoms, 0.1, d_output);
+      cenergy<<<Gsz, Bsz, 0>>>(runatoms, 0.1, d_output);
       CUERR // check and clear any existing errors
 
       if (parameters->synchronizeGpu) cudaThreadSynchronize();

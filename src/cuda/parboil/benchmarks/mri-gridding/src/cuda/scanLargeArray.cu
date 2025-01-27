@@ -228,7 +228,7 @@ void scanLargeArray( unsigned int gridNumElements, unsigned int* data_d) {
 
         dim3 block (BLOCK_SIZE/2);
         dim3 grid (gridSize);
-        scan_L1_kernel<<<1, block>>>(numElems, data_d+(i*GRID_SIZE*BLOCK_SIZE), inter_d+(i*GRID_SIZE));
+        scan_L1_kernel<<<grid, block>>>(numElems, data_d+(i*GRID_SIZE*BLOCK_SIZE), inter_d+(i*GRID_SIZE));
     }
 
     unsigned int stride = 1;
@@ -237,7 +237,7 @@ void scanLargeArray( unsigned int gridNumElements, unsigned int* data_d) {
         dim3 block (dim_block/2);
         dim3 grid (d/dim_block);
 
-        scan_inter1_kernel<<<1, block, EXPANDED_SIZE(dim_block)*sizeof(unsigned int)>>>(inter_d, stride);
+        scan_inter1_kernel<<<grid, block, EXPANDED_SIZE(dim_block)*sizeof(unsigned int)>>>(inter_d, stride);
 
         stride *= dim_block;
     }
@@ -250,7 +250,7 @@ void scanLargeArray( unsigned int gridNumElements, unsigned int* data_d) {
         dim3 block (dim_block/2);
         dim3 grid (d/dim_block);
 
-        scan_inter2_kernel<<<1, block, EXPANDED_SIZE(dim_block)*sizeof(unsigned int)>>>(inter_d, stride);
+        scan_inter2_kernel<<<grid, block, EXPANDED_SIZE(dim_block)*sizeof(unsigned int)>>>(inter_d, stride);
     }
 
     for (unsigned int i=0; i < (size+GRID_SIZE-1)/GRID_SIZE; i++){
@@ -260,7 +260,7 @@ void scanLargeArray( unsigned int gridNumElements, unsigned int* data_d) {
         dim3 block (BLOCK_SIZE/2);
         dim3 grid (gridSize);
 
-        uniformAdd<<<1, block>>>(numElems, data_d+(i*GRID_SIZE*BLOCK_SIZE), inter_d+(i*GRID_SIZE));
+        uniformAdd<<<grid, block>>>(numElems, data_d+(i*GRID_SIZE*BLOCK_SIZE), inter_d+(i*GRID_SIZE));
     }
 
     cudaFree(inter_d);

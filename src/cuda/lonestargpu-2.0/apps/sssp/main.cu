@@ -88,7 +88,7 @@ int main(int argc, char *argv[]) {
 
 	kconf.setMaxThreadsPerBlock();
 	printf("initializing.\n");
-	initialize <<<1, kconf.getNumberOfBlockThreads()>>> (dist, graph.nnodes);
+	initialize <<<kconf.getNumberOfBlocks(), kconf.getNumberOfBlockThreads()>>> (dist, graph.nnodes);
 	CudaTest("initializing failed");
 
 	sssp(hdist, dist, graph, totalcommu);
@@ -96,7 +96,7 @@ int main(int argc, char *argv[]) {
 	cudaMemcpy(nerr, &intzero, sizeof(intzero), cudaMemcpyHostToDevice);
 	kconf.setMaxThreadsPerBlock();
 	printf("verifying.\n");
-	dverifysolution<<<1, kconf.getNumberOfBlockThreads()>>> (dist, graph, nerr);
+	dverifysolution<<<kconf.getNumberOfBlocks(), kconf.getNumberOfBlockThreads()>>> (dist, graph, nerr);
 	CudaTest("dverifysolution failed");
 	cudaMemcpy(&hnerr, nerr, sizeof(hnerr), cudaMemcpyDeviceToHost);
 	printf("\tno of errors = %d.\n", hnerr);

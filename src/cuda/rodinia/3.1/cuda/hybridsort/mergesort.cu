@@ -51,8 +51,8 @@ float4* runMergeSort(int listsize, int divisions,
 	int blocks = ((listsize/4)%THREADS == 0) ? (listsize/4)/THREADS : (listsize/4)/THREADS + 1; 
 	dim3 grid(blocks, 1);
 	cudaBindTexture(0,tex, d_origList, channelDesc, listsize*sizeof(float)); 
-	// mergeSortFirst<<< 1, threads >>>(d_resultList, listsize); 
-	mergeSortFirst<<< 1, 32 >>>(d_resultList, listsize);
+	// mergeSortFirst<<< grid, threads >>>(d_resultList, listsize);
+	mergeSortFirst<<< 1, threads >>>(d_resultList, listsize);
 
 	////////////////////////////////////////////////////////////////////////////
 	// Then, go level by level
@@ -84,12 +84,12 @@ float4* runMergeSort(int listsize, int divisions,
 		d_origList = d_resultList; 
 		d_resultList = tempList; 
 		cudaBindTexture(0,tex, d_origList, channelDesc, listsize*sizeof(float)); 
-		// mergeSortPass <<< 1, threads >>>(d_resultList, nrElems, threadsPerDiv);  
-		mergeSortPass <<< 1, 32 >>>(d_resultList, nrElems, threadsPerDiv); 
+		// mergeSortPass <<< grid, threads >>>(d_resultList, nrElems, threadsPerDiv); 
+		mergeSortPass <<< 1, threads >>>(d_resultList, nrElems, threadsPerDiv); 
 		nrElems *= 2; 
 		floatsperthread = (nrElems*4); 
-		// if(threadsPerDiv == 1) break; 
-		break;
+		if(threadsPerDiv == 1) break; 
+		break; // L.Jeanmougin
 	}
 	////////////////////////////////////////////////////////////////////////////
 	// Now, get rid of the NULL elements
@@ -103,8 +103,8 @@ float4* runMergeSort(int listsize, int divisions,
 			largestSize/threads.x : 
 			(largestSize/threads.x) + 1; 
 	grid.y = divisions; 
-	// mergepack <<< 1, threads >>> ((float *)d_resultList, (float *)d_origList);
-	mergepack <<< 1, 32 >>> ((float *)d_resultList, (float *)d_origList);
+	// mergepack <<< grid, threads >>> ((float *)d_resultList, (float *)d_origList);
+	mergepack <<< 1, threads >>> ((float *)d_resultList, (float *)d_origList);
 
 	free(startaddr);
 	return d_origList; 

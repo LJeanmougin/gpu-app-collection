@@ -216,7 +216,7 @@ int main(int argc, char **argv)
     int graph_color = 1;
 
     // Initialize arrays
-    ini<<< 1, threads >>>(max_d, min_d, num_nodes);
+    ini<<< grid, threads >>>(max_d, min_d, num_nodes);
 
     // Main computation loop
     double timer3 = gettime();
@@ -232,12 +232,12 @@ int main(int argc, char **argv)
         }
 
         // Launch the color kernel 1
-        color1 <<< 1, threads >>>(row_d, col_d, node_value_d, color_d,
+        color1 <<< grid, threads >>>(row_d, col_d, node_value_d, color_d,
                                      stop_d, max_d, min_d, graph_color,
                                      num_nodes, num_edges);
 
         // Launch the color kernel 2
-        color2 <<< 1, threads >>>(node_value_d, color_d, max_d, min_d,
+        color2 <<< grid, threads >>>(node_value_d, color_d, max_d, min_d,
                                      graph_color, num_nodes, num_edges);
 
         err = cudaMemcpy(&stop, stop_d, sizeof(int), cudaMemcpyDeviceToHost);
@@ -247,7 +247,7 @@ int main(int argc, char **argv)
 
         // Update the color label for the next iter
         graph_color = graph_color + 2;
-        break;
+
     }
     cudaThreadSynchronize();
 

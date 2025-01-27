@@ -83,8 +83,8 @@ void hotspot_opt1(float *p, float *tIn, float *tOut,
 
     long long start = get_time();
     for (int i = 0; i < numiter; ++i) {
-        // hotspotOpt1<<<1, block_dim>>>
-        hotspotOpt1<<<1, 32>>>
+        // hotspotOpt1<<<grid_dim, block_dim>>>
+        hotspotOpt1<<<1, block_dim>>>
             (p_d, tIn_d, tOut_d, stepDivCap, nx, ny, nz, ce, cw, cn, cs, ct, cb, cc);
         float *t = tIn_d;
         tIn_d = tOut_d;

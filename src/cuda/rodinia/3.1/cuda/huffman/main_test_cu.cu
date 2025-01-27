@@ -39,7 +39,6 @@ void runVLCTest(char *file_name, uint num_block_threads, uint num_blocks=1);
 extern "C" void cpu_vlc_encode(unsigned int* indata, unsigned int num_elements, unsigned int* outdata, unsigned int *outsize, unsigned int *codewords, unsigned int* codewordlens);
 
 int main(int argc, char* argv[]){
-	 
     if(!InitCUDA()) { return 0;	}
     unsigned int num_block_threads = 256;
     if (argc > 1)
@@ -140,8 +139,8 @@ void runVLCTest(char *file_name, uint num_block_threads, uint num_blocks) {
 
     cudaEventRecord( start, 0 );
         for (int i=0; i<NT; i++) {
-            // vlc_encode_kernel_sm64huff<<<1, block_size, sm_size>>>(d_sourceData, d_codewords, d_codewordlens,  
-            vlc_encode_kernel_sm64huff<<<1, 32, sm_size>>>(d_sourceData, d_codewords, d_codewordlens,  
+            // vlc_encode_kernel_sm64huff<<<grid_size, block_size, sm_size>>>(d_sourceData, d_codewords, d_codewordlens,  
+            vlc_encode_kernel_sm64huff<<<1, block_size, sm_size>>>(d_sourceData, d_codewords, d_codewordlens,  
 #ifdef TESTING
                     d_cw32, d_cw32len, d_cw32idx, 
 #endif
@@ -165,7 +164,8 @@ void runVLCTest(char *file_name, uint num_block_threads, uint num_blocks) {
     printf("Num_blocks to be passed to scan is %d.\n", num_scan_elements);
     prescanArray(d_cindex2, d_cindex, num_scan_elements);
 
-    pack2<<<1, 16>>>((unsigned int*)d_destData, d_cindex, d_cindex2, (unsigned int*)d_destDataPacked, num_elements/num_scan_elements);
+    // pack2<<< num_scan_elements/16, 16>>>((unsigned int*)d_destData, d_cindex, d_cindex2, (unsigned int*)d_destDataPacked, num_elements/num_scan_elements);
+    pack2<<< 1, 512>>>((unsigned int*)d_destData, d_cindex, d_cindex2, (unsigned int*)d_destDataPacked, num_elements/num_scan_elements);
     CUT_CHECK_ERROR("Pack2 Kernel execution failed\n");
     deallocBlockSums();
 

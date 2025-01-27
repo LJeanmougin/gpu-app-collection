@@ -45,7 +45,7 @@ extern "C" void aesEncryptHandler128(unsigned *d_Result, unsigned *d_Input, int 
 	dim3  threads(BSIZE, 1);
     dim3  grid((inputSize/BSIZE)/4, 1);
 
-	aesEncrypt128<<< 1, threads >>>( d_Result, d_Input, inputSize);
+	aesEncrypt128<<< grid, threads >>>( d_Result, d_Input, inputSize);
     CUDA_SAFE_CALL( cudaThreadSynchronize() );
 }
 
@@ -54,7 +54,7 @@ extern "C" void aesDecryptHandler128(unsigned *d_Result, unsigned *d_Input, int 
 	dim3  threads(BSIZE, 1);
     dim3  grid((inputSize/BSIZE)/4, 1);
 
-	aesDecrypt128<<< 1, threads >>>( d_Result, d_Input, inputSize);
+	aesDecrypt128<<< grid, threads >>>( d_Result, d_Input, inputSize);
     CUDA_SAFE_CALL( cudaThreadSynchronize() );
 }
 
@@ -63,7 +63,7 @@ extern "C" void aesEncryptHandler256(unsigned *d_Result, unsigned *d_Input, int 
 	dim3  threads(BSIZE, 1);
     dim3  grid((inputSize/BSIZE)/4, 1);
 
-	aesEncrypt256<<< 1, threads >>>( d_Result, d_Input, inputSize);
+	aesEncrypt256<<< grid, threads >>>( d_Result, d_Input, inputSize);
     CUDA_SAFE_CALL( cudaThreadSynchronize() );
 }
 
@@ -72,7 +72,7 @@ extern "C" void aesDecryptHandler256(unsigned *d_Result, unsigned *d_Input, int 
 	dim3  threads(BSIZE, 1);
     dim3  grid((inputSize/BSIZE)/4, 1);
 
-	aesDecrypt256<<< 1, threads >>>( d_Result, d_Input, inputSize);
+	aesDecrypt256<<< grid, threads >>>( d_Result, d_Input, inputSize);
     CUDA_SAFE_CALL( cudaThreadSynchronize() );
 }
 

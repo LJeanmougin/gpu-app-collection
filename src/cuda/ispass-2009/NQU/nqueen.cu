@@ -478,7 +478,7 @@ long long solve_nqueen_cuda(int n, int steps)
 							cudaMemcpy(l_masks_cuda, total_l_masks, sizeof(int) * total_conditions, cudaMemcpyHostToDevice);
 							cudaMemcpy(r_masks_cuda, total_r_masks, sizeof(int) * total_conditions, cudaMemcpyHostToDevice);
 
-							solve_nqueen_cuda_kernel<<<1, THREAD_NUM>>>(n, n - mark, masks_cuda, l_masks_cuda, r_masks_cuda, results_cuda, total_conditions);
+							solve_nqueen_cuda_kernel<<<steps/THREAD_NUM, THREAD_NUM>>>(n, n - mark, masks_cuda, l_masks_cuda, r_masks_cuda, results_cuda, total_conditions);
 
 							computed = true;
 
@@ -491,7 +491,6 @@ long long solve_nqueen_cuda(int n, int steps)
 					i --;
 				}
 			}
-			break; // L.JEANMOUGIN
 		}
 	}
 	
@@ -510,7 +509,7 @@ long long solve_nqueen_cuda(int n, int steps)
 	cudaMemcpy(l_masks_cuda, total_l_masks, sizeof(int) * total_conditions, cudaMemcpyHostToDevice);
 	cudaMemcpy(r_masks_cuda, total_r_masks, sizeof(int) * total_conditions, cudaMemcpyHostToDevice);
 
-	solve_nqueen_cuda_kernel<<<1, THREAD_NUM>>>(n, n - mark, masks_cuda, l_masks_cuda, r_masks_cuda, results_cuda, total_conditions);
+	solve_nqueen_cuda_kernel<<<steps/THREAD_NUM, THREAD_NUM>>>(n, n - mark, masks_cuda, l_masks_cuda, r_masks_cuda, results_cuda, total_conditions);
 
 	cudaMemcpy(results, results_cuda, sizeof(int) * steps / THREAD_NUM, cudaMemcpyDeviceToHost);
 
@@ -567,7 +566,7 @@ long long solve_nqueen_cuda(int n, int steps)
 							cudaMemcpy(l_masks_cuda, total_l_masks, sizeof(int) * total_conditions, cudaMemcpyHostToDevice);
 							cudaMemcpy(r_masks_cuda, total_r_masks, sizeof(int) * total_conditions, cudaMemcpyHostToDevice);
 
-							solve_nqueen_cuda_kernel<<<1, THREAD_NUM>>>(n, n - mark, masks_cuda, l_masks_cuda, r_masks_cuda, results_cuda, total_conditions);
+							solve_nqueen_cuda_kernel<<<steps/THREAD_NUM, THREAD_NUM>>>(n, n - mark, masks_cuda, l_masks_cuda, r_masks_cuda, results_cuda, total_conditions);
 
 							computed = true;
 
@@ -580,7 +579,6 @@ long long solve_nqueen_cuda(int n, int steps)
 					i --;
 				}
 			}
-			break; // L.JEANMOUGIN
 		}
 
 		if(computed) {
@@ -597,7 +595,7 @@ long long solve_nqueen_cuda(int n, int steps)
 		cudaMemcpy(l_masks_cuda, total_l_masks, sizeof(int) * total_conditions, cudaMemcpyHostToDevice);
 		cudaMemcpy(r_masks_cuda, total_r_masks, sizeof(int) * total_conditions, cudaMemcpyHostToDevice);
 
-		solve_nqueen_cuda_kernel<<<1, THREAD_NUM>>>(n, n - mark, masks_cuda, l_masks_cuda, r_masks_cuda, results_cuda, total_conditions);
+		solve_nqueen_cuda_kernel<<<steps/THREAD_NUM, THREAD_NUM>>>(n, n - mark, masks_cuda, l_masks_cuda, r_masks_cuda, results_cuda, total_conditions);
 
 		cudaMemcpy(results, results_cuda, sizeof(int) * steps / THREAD_NUM, cudaMemcpyDeviceToHost);
 

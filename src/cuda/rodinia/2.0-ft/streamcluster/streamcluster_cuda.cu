@@ -32,11 +32,8 @@
 
 using namespace std;
 
-// L.Jeanmougin : 1 warp, 1 block
-// #define THREADS_PER_BLOCK 512
-// #define MAXBLOCKS 65536
 #define THREADS_PER_BLOCK 512
-#define MAXBLOCKS 1
+#define MAXBLOCKS 65536
 #define PROFILE
 
 /* host memory analogous to device memory */
@@ -211,7 +208,7 @@ float pgain( long x, Points *points, float z, long int *numcenters, int kmax, bo
 #ifdef PROFILE
 	double t9 = gettime();
 #endif
-		// CHANGING NUMBER OF BLOCKS TO 1
+	// pgain_kernel<<< grid_size, THREADS_PER_BLOCK,  smSize>>>(	
 	pgain_kernel<<< 1, THREADS_PER_BLOCK,  smSize>>>(	
 																											num,								// in:	# of data
 																											dim,									// in:	dimension of point coordinates

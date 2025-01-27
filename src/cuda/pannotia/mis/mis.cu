@@ -217,7 +217,7 @@ int main(int argc, char **argv)
     dim3 grid(num_blocks, 1, 1);
 
     // Launch the initialization kernel
-    init <<<1, threads>>>(s_array_d, c_array_d, c_array_u_d,
+    init <<<grid, threads>>>(s_array_d, c_array_d, c_array_u_d,
                              num_nodes, num_edges);
     cudaThreadSynchronize();
     err = cudaGetLastError();
@@ -240,17 +240,17 @@ int main(int argc, char **argv)
         }
 
         // Launch mis1
-        mis1 <<<1, threads>>>(row_d, col_d, node_value_d, s_array_d,
+        mis1 <<<grid, threads>>>(row_d, col_d, node_value_d, s_array_d,
                                  c_array_d, min_array_d, stop_d, num_nodes,
                                  num_edges);
 
         // Launch mis2
-        mis2 <<<1, threads>>>(row_d, col_d, node_value_d, s_array_d,
+        mis2 <<<grid, threads>>>(row_d, col_d, node_value_d, s_array_d,
                                  c_array_d, c_array_u_d, min_array_d, num_nodes,
                                  num_edges);
 
         // Launch mis3
-        mis3 <<<1, threads>>>(c_array_u_d, c_array_d, num_nodes);
+        mis3 <<<grid, threads>>>(c_array_u_d, c_array_d, num_nodes);
 
         // Copy the termination variable back
         err = cudaMemcpy(&stop, stop_d, sizeof(int), cudaMemcpyDeviceToHost);
@@ -260,7 +260,7 @@ int main(int argc, char **argv)
         }
 
         iterations++;
-        break;
+
     }
 
     cudaThreadSynchronize();

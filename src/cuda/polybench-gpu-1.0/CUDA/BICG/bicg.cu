@@ -179,9 +179,9 @@ void bicgCuda(DATA_TYPE* A, DATA_TYPE* r, DATA_TYPE* s, DATA_TYPE* p, DATA_TYPE*
 	dim3 grid2((size_t)(ceil( ((float)NX) / ((float)block.x) )), 1);
 
 	t_start = rtclock();
-	bicg_kernel1<<< 1, block >>>(A_gpu, r_gpu, s_gpu);
+	bicg_kernel1<<< grid1, block >>>(A_gpu, r_gpu, s_gpu);
 	cudaThreadSynchronize();
-	bicg_kernel2<<< 1, block >>>(A_gpu, p_gpu, q_gpu);
+	bicg_kernel2<<< grid2, block >>>(A_gpu, p_gpu, q_gpu);
 	cudaThreadSynchronize();
 	t_end = rtclock();
 	fprintf(stdout, "GPU Runtime: %0.6lfs\n", t_end - t_start);

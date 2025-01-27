@@ -214,7 +214,7 @@ int work_2(	int xmax,
 	}
 
 	// solver_2<<<blocks, threads>>>(	workload,
-	solver_2<<<1, 32>>>(	workload,
+	solver_2<<<1, threads>>>(	workload,
 																xmax,
 
 																d_x,

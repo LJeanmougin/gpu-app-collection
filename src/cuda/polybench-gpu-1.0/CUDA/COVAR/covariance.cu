@@ -208,11 +208,11 @@ void covarianceCuda(DATA_TYPE* data, DATA_TYPE* symmat, DATA_TYPE* mean, DATA_TY
 	
 	t_start = rtclock();
 
-	mean_kernel<<<1, block1>>>(mean_gpu,data_gpu);
+	mean_kernel<<<grid1, block1>>>(mean_gpu,data_gpu);
 	cudaThreadSynchronize();
-	reduce_kernel<<<1, block2>>>(mean_gpu,data_gpu);
+	reduce_kernel<<<grid2, block2>>>(mean_gpu,data_gpu);
 	cudaThreadSynchronize();
-	covar_kernel<<<1, block3>>>(symmat_gpu,data_gpu);
+	covar_kernel<<<grid3, block3>>>(symmat_gpu,data_gpu);
 	cudaThreadSynchronize();
 	t_end = rtclock();
 	fprintf(stdout, "GPU Runtime: %0.6lfs\n", t_end - t_start);
@@ -244,15 +244,13 @@ int main()
 	GPU_argv_init();
 
 	covarianceCuda(data, symmat, mean, symmat_outputFromGpu);
+	
+	t_start = rtclock();
+	covariance(data, symmat, mean);
+	t_end = rtclock();
+	fprintf(stdout, "CPU Runtime: %0.6lfs\n", t_end - t_start);
 
-	// L.Jeanmougin : No comparison needed for exp
-
-	// t_start = rtclock();
-	// covariance(data, symmat, mean);
-	// t_end = rtclock();
-	// fprintf(stdout, "CPU Runtime: %0.6lfs\n", t_end - t_start);
-
-	// compareResults(symmat, symmat_outputFromGpu);
+	compareResults(symmat, symmat_outputFromGpu);
 
 	free(data);
 	free(symmat);

@@ -21,8 +21,7 @@
 #include <math.h>
 #include <cuda.h>
 
-// Changed from 512 to 1024
-#define MAX_THREADS_PER_BLOCK 1024
+#define MAX_THREADS_PER_BLOCK 512
 
 int no_of_nodes;
 int edge_list_size;
@@ -179,7 +178,7 @@ void BFSGraph( int argc, char** argv)
 	printf("Copied Everything to GPU memory\n");
 
 	// setup execution parameters
-	dim3  grid( 1, 1, 1);
+	dim3  grid( num_of_blocks, 1, 1);
 	dim3  threads( num_of_threads_per_block, 1, 1);
 
 	int k=0;
@@ -191,14 +190,13 @@ void BFSGraph( int argc, char** argv)
 		//if no thread changes this value then the loop stops
 		stop=false;
 		cudaMemcpy( d_over, &stop, sizeof(bool), cudaMemcpyHostToDevice) ;
-		// L.Jeanmougin : 1 Block 32 Threads
+		// Kernel<<< grid, threads, 0 >>>( d_graph_nodes, d_graph_edges, d_graph_mask, d_updating_graph_mask, d_graph_visited, d_cost, no_of_nodes);
 		Kernel<<< 1, threads, 0 >>>( d_graph_nodes, d_graph_edges, d_graph_mask, d_updating_graph_mask, d_graph_visited, d_cost, no_of_nodes);
-		// Kernel<<< 1, 32, 0 >>>( d_graph_nodes, d_graph_edges, d_graph_mask, d_updating_graph_mask, d_graph_visited, d_cost, no_of_nodes);
 		// check if kernel execution generated and error
 		
 
+		// Kernel2<<< grid, threads, 0 >>>( d_graph_mask, d_updating_graph_mask, d_graph_visited, d_over, no_of_nodes);
 		Kernel2<<< 1, threads, 0 >>>( d_graph_mask, d_updating_graph_mask, d_graph_visited, d_over, no_of_nodes);
-		// Kernel2<<< 1, 32, 0 >>>( d_graph_mask, d_updating_graph_mask, d_graph_visited, d_over, no_of_nodes);
 		// check if kernel execution generated and error
 		
 

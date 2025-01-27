@@ -28,7 +28,6 @@ data:
 # Rodinia 2.0 Functional Test Stuff
 ###################################################################################################3
 rodinia_2.0-ft:
-	$(SETENV) make $(MAKE_ARGS) -C cuda/rodinia/2.0-ft/vecadd
 	$(SETENV) make $(MAKE_ARGS) -C cuda/rodinia/2.0-ft/backprop
 	$(SETENV) make $(MAKE_ARGS) -C cuda/rodinia/2.0-ft/bfs
 	$(SETENV) make $(MAKE_ARGS) -C cuda/rodinia/2.0-ft/heartwall

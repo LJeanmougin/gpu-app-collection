@@ -126,12 +126,12 @@ unsigned int *d_Result1024;
 
 //Internal memory allocation
 void initHistogram1024(void){
-    ( cudaMalloc((void **)&d_Result1024, HISTOGRAM_SIZE ));
+    checkCudaErrors( cudaMalloc((void **)&d_Result1024, HISTOGRAM_SIZE ));
 }
 
 //Internal memory deallocation
 void closeHistogram1024(void){
-    ( cudaFree(d_Result1024) );
+    checkCudaErrors( cudaFree(d_Result1024) );
 }
 
 //histogram1024 CPU front-end
@@ -142,14 +142,14 @@ void histogram1024GPU(
 	float maximum,
     int dataN)
 {
-    ( cudaMemset(d_Result1024, 0, HISTOGRAM_SIZE) );
-    // histogram1024Kernel<<<1, THREAD_N>>>(
-    histogram1024Kernel<<<1, 32>>>(
+    checkCudaErrors( cudaMemset(d_Result1024, 0, HISTOGRAM_SIZE) );
+    // histogram1024Kernel<<<BLOCK_N, THREAD_N>>>(
+    histogram1024Kernel<<<1, THREAD_N>>>(
         d_Result1024,
         d_Data,
 		minimum,
 		maximum,
         dataN
     );
-    ( cudaMemcpy(h_Result, d_Result1024, HISTOGRAM_SIZE, cudaMemcpyDeviceToHost) );
+    checkCudaErrors( cudaMemcpy(h_Result, d_Result1024, HISTOGRAM_SIZE, cudaMemcpyDeviceToHost) );
 }

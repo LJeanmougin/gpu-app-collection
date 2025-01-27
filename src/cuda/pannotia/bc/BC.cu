@@ -208,12 +208,12 @@ int main(int argc, char **argv)
     dim3 grid(num_blocks, 1, 1);
 
     // Initialization
-    clean_bc<<< 1, threads >>>(bc_d, num_nodes);
+    clean_bc<<< grid, threads >>>(bc_d, num_nodes);
 
     // Main computation loop
     for (int i = 0; i < num_nodes && i < MAX_ITERS; i++) {
 
-        clean_1d_array<<< 1, threads >>>(i, dist_d, sigma_d, rho_d,
+        clean_1d_array<<< grid, threads >>>(i, dist_d, sigma_d, rho_d,
                                             num_nodes);
 
         // Depth of the traversal
@@ -228,7 +228,7 @@ int main(int argc, char **argv)
             // Copy the termination variable to the device
             cudaMemcpy(stop_d, &stop, sizeof(int), cudaMemcpyHostToDevice);
 
-            bfs_kernel<<< 1, threads >>>(row_d, col_d, dist_d, rho_d, stop_d,
+            bfs_kernel<<< grid, threads >>>(row_d, col_d, dist_d, rho_d, stop_d,
                                             num_nodes, num_edges, dist);
 
             // Copy back the termination variable from the device
@@ -236,24 +236,23 @@ int main(int argc, char **argv)
 
             // Another level
             dist++;
-            break;
+
         } while (stop) ;
 
         cudaThreadSynchronize();
 
         // Traverse back from the deepest part of the tree
         while (dist) {
-            backtrack_kernel<<< 1, threads >>>(row_trans_d, col_trans_d,
+            backtrack_kernel<<< grid, threads >>>(row_trans_d, col_trans_d,
                                                 dist_d, rho_d, sigma_d,
                                                 num_nodes, num_edges, dist, i,
                                                 bc_d);
 
             // Back one level
             dist--;
-            break;
         }
         cudaThreadSynchronize();
-        break;
+
     }
     cudaThreadSynchronize();
     timer4 = gettime();

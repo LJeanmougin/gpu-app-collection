@@ -207,7 +207,6 @@ void processDWT(struct dwt *d, int forward, int writeVisual)
 
 int main(int argc, char **argv) 
 {
-	 
     int optindex = 0;
     char ch;
     struct option longopts[] = {

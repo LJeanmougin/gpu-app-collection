@@ -440,7 +440,7 @@ void MaxwellsKernel3d(Mesh *mesh, float frka, float frkb, float fdt){
   ThreadsPerBlock = p_Np;
 
   /* evaluate volume derivatives */
-  MaxwellsGPU_VOL_Kernel3D <<< 1, ThreadsPerBlock >>>  (c_rhsQ);
+  MaxwellsGPU_VOL_Kernel3D <<< BlocksPerGrid, ThreadsPerBlock >>>  (c_rhsQ);
 
   /* finalize sends and recvs, and transfer to device */
   MaxwellsMPIRecv3d(mesh, c_partQ);
@@ -453,7 +453,7 @@ void MaxwellsKernel3d(Mesh *mesh, float frka, float frkb, float fdt){
     ThreadsPerBlock = p_Np;
 
   /* evaluate surface contributions */
-  MaxwellsGPU_SURF_Kernel3D <<< 1, ThreadsPerBlock >>> (c_Q, c_rhsQ);
+  MaxwellsGPU_SURF_Kernel3D <<< BlocksPerGrid, ThreadsPerBlock >>> (c_Q, c_rhsQ);
 
   int Ntotal = mesh->K*BSIZE*p_Nfields;
   
@@ -461,7 +461,7 @@ void MaxwellsKernel3d(Mesh *mesh, float frka, float frkb, float fdt){
   BlocksPerGrid = (Ntotal+ThreadsPerBlock-1)/ThreadsPerBlock;
 
   /* update RK Step */
-  MaxwellsGPU_RK_Kernel3D<<< 1, ThreadsPerBlock >>> 
+  MaxwellsGPU_RK_Kernel3D<<< BlocksPerGrid, ThreadsPerBlock >>> 
 	  (Ntotal, c_resQ, c_rhsQ, c_Q, frka, frkb, fdt);
 
 }
@@ -543,7 +543,7 @@ void get_partial_gpu_data3d(int Ntotal, int *g_index, float *h_partQ){
   int ThreadsPerBlock = 256;
   int BlocksPerGrid = (Ntotal+ThreadsPerBlock-1)/ThreadsPerBlock;
 
-  partial_get_kernel3d <<< 1, ThreadsPerBlock >>> (Ntotal, g_index, c_tmp);
+  partial_get_kernel3d <<< BlocksPerGrid, ThreadsPerBlock >>> (Ntotal, g_index, c_tmp);
 
   cudaMemcpy(h_partQ, c_tmp, Ntotal*sizeof(float), cudaMemcpyDeviceToHost);
 }

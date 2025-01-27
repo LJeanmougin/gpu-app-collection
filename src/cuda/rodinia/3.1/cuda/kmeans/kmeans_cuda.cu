@@ -71,8 +71,8 @@ void allocateMemory(int npoints, int nfeatures, int nclusters, float **features)
 	cudaMalloc((void**) &feature_d, npoints*nfeatures*sizeof(float));
 		
 	/* invert the data array (kernel execution) */	
-	// invert_mapping<<<1,num_threads>>>(feature_flipped_d,feature_d,npoints,nfeatures);
-	invert_mapping<<<1,32>>>(feature_flipped_d,feature_d,npoints,nfeatures);
+	// invert_mapping<<<num_blocks,num_threads>>>(feature_flipped_d,feature_d,npoints,nfeatures);
+	invert_mapping<<<1,num_threads>>>(feature_flipped_d,feature_d,npoints,nfeatures);
 		
 	/* allocate memory for membership_d[] and clusters_d[][] (device) */
 	cudaMalloc((void**) &membership_d, npoints*sizeof(int));
@@ -196,8 +196,8 @@ kmeansCuda(float  **feature,				/* in: [npoints][nfeatures] */
     dim3  threads( num_threads_perdim*num_threads_perdim );
     
 	/* execute the kernel */
-    // kmeansPoint<<< 1, threads >>>( feature_d,
-    kmeansPoint<<< 1, 32 >>>( feature_d,
+    // kmeansPoint<<< grid, threads >>>( feature_d,
+    kmeansPoint<<< 1, threads >>>( feature_d,
                                       nfeatures,
                                       npoints,
                                       nclusters,
@@ -210,7 +210,7 @@ kmeansCuda(float  **feature,				/* in: [npoints][nfeatures] */
 
 	/* copy back membership (device to host) */
 	cudaMemcpy(membership_new, membership_d, npoints*sizeof(int), cudaMemcpyDeviceToHost);	
-	return 0; // L.Jeanmougin : avoid segfault after partial grid execution
+
 #ifdef BLOCK_CENTER_REDUCE
     /*** Copy back arrays of per block sums ***/
     float * block_clusters_h = (float *) malloc(

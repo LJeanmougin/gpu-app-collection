@@ -173,9 +173,9 @@ void render()
     // call CUDA kernel, writing results to PBO
     CUT_SAFE_CALL(cutStartTimer(timer)); 
     #ifdef DEBUG_RT_CUDA
-    render<<<1, blockSize>>>(d_debug_float4, d_debug_uint, d_output, d_node, width, height, anim, obs.getDistance());
+    render<<<gridSize, blockSize>>>(d_debug_float4, d_debug_uint, d_output, d_node, width, height, anim, obs.getDistance());
     #else
-    render<<<1, blockSize>>>(d_output, d_node, width, height, anim, obs.getDistance());
+    render<<<gridSize, blockSize>>>(d_output, d_node, width, height, anim, obs.getDistance());
     #endif
     CUDA_SAFE_CALL( cudaThreadSynchronize() );
     CUT_SAFE_CALL(cutStopTimer(timer));

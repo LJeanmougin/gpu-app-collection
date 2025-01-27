@@ -134,7 +134,7 @@ mergeSortPass(float4 *result, int nrElems, int threadsPerDiv)
 				break; 
 			}
 		}
-		break;
+
 	}
 	resStart[outidx++] = b;
 }

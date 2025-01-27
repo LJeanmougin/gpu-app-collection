@@ -234,11 +234,11 @@ void mm3Cuda(DATA_TYPE* A, DATA_TYPE* B, DATA_TYPE* C, DATA_TYPE* D, DATA_TYPE* 
 	dim3 grid3((size_t)(ceil( ((float)NL) / ((float)DIM_THREAD_BLOCK_X) )),(size_t)(ceil((float)NI/ ((float)DIM_THREAD_BLOCK_Y) )));
 
 	t_start = rtclock();
-	mm3_kernel1<<<1,block>>>(A_gpu, B_gpu, E_gpu);
+	mm3_kernel1<<<grid1,block>>>(A_gpu, B_gpu, E_gpu);
 	cudaThreadSynchronize();
-	mm3_kernel2<<<1,block>>>(C_gpu, D_gpu, F_gpu);
+	mm3_kernel2<<<grid2,block>>>(C_gpu, D_gpu, F_gpu);
 	cudaThreadSynchronize();
-	mm3_kernel3<<<1,block>>>(E_gpu, F_gpu, G_gpu);
+	mm3_kernel3<<<grid3,block>>>(E_gpu, F_gpu, G_gpu);
 	cudaThreadSynchronize();
 	t_end = rtclock();
 	cudaMemcpy(G_outputFromGpu, G_gpu, sizeof(DATA_TYPE) * NI * NL, cudaMemcpyDeviceToHost);

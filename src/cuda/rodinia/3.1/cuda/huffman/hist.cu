@@ -103,10 +103,10 @@ int runHisto(char* file, unsigned int* freq, unsigned int memSize, unsigned int 
 
 
         // kernel launch - 2x the number of mps gave best timing
-        // histo_kernel<<<1,256,0,stream0>>>( dev_buffer0, partSize, dev_histo );
-        // histo_kernel<<<1,256,0,stream1>>>( dev_buffer1, partSize, dev_histo );
-        histo_kernel<<<1,32,0,stream0>>>( dev_buffer0, partSize, dev_histo );
-        histo_kernel<<<1,32,0,stream1>>>( dev_buffer1, partSize, dev_histo );
+        // histo_kernel<<<blocks*2,256,0,stream0>>>( dev_buffer0, partSize, dev_histo );
+        histo_kernel<<<1,256,0,stream0>>>( dev_buffer0, partSize, dev_histo );
+        // histo_kernel<<<blocks*2,256,0,stream1>>>( dev_buffer1, partSize, dev_histo );
+        histo_kernel<<<1,256,0,stream1>>>( dev_buffer1, partSize, dev_histo );
     }
     CHECK(cudaStreamSynchronize(stream0));
     CHECK(cudaStreamSynchronize(stream1));

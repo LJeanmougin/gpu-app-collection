@@ -103,7 +103,6 @@ void ParseCommandLine(int argc, char ** argv)
 
 int main(int argc, char* argv[])
 {
-	 
    ParseCommandLine(argc, argv);
 
    fprintf(stderr, "TWO_LEVEL_NODE_TREE is %d\n", TWO_LEVEL_NODE_TREE);

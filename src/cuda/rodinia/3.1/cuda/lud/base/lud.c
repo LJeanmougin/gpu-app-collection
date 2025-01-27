@@ -40,7 +40,6 @@ lud_base(float *m, int matrix_dim);
 int
 main ( int argc, char *argv[] )
 {
-	 
   int matrix_dim = 32; /* default matrix_dim */
   int opt, option_index=0;
   func_ret_t ret;

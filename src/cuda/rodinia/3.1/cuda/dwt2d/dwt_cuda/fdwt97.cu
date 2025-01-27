@@ -327,8 +327,8 @@ namespace dwt_cuda {
     
     // run kernel, possibly measure time and finally check the call
     PERF_BEGIN
-    // fdwt97Kernel<WIN_SX, WIN_SY><<<1, WIN_SX>>>(in, out, sx, sy, steps);
-    fdwt97Kernel<WIN_SX, WIN_SY><<<1, 32>>>(in, out, sx, sy, steps);
+    // fdwt97Kernel<WIN_SX, WIN_SY><<<gSize, WIN_SX>>>(in, out, sx, sy, steps);
+    fdwt97Kernel<WIN_SX, WIN_SY><<<1, WIN_SX>>>(in, out, sx, sy, steps);
     PERF_END("        FDWT97", sx, sy)
     CudaDWTTester::checkLastKernelCall("FDWT 9/7 kernel");
   }

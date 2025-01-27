@@ -51,7 +51,7 @@ void master(fp timeinst,
 	blocks.x = 2;
 	blocks.y = 1;
 	// kernel<<<blocks, threads>>>(	timeinst,
-	kernel<<<1, 32>>>(	timeinst,
+	kernel<<<1, threads>>>(	timeinst,
 															d_initvalu,
 															d_finavalu,
 															d_params,

@@ -321,7 +321,7 @@ int main(int argc, char **argv){
 
   // Launch the device computation threads
 
-  Pathcalc_Portfolio_KernelGPU2<<<1, dimBlock>>>(d_v);
+  Pathcalc_Portfolio_KernelGPU2<<<dimGrid, dimBlock>>>(d_v);
   CUT_CHECK_ERROR("Pathcalc_Portfolio_kernelGPU2() execution failed\n");
   CUDA_SAFE_CALL( cudaThreadSynchronize() );
 
@@ -347,7 +347,7 @@ int main(int argc, char **argv){
 
   // Launch the device computation threads
 
-  Pathcalc_Portfolio_KernelGPU<<<1, dimBlock>>>(d_v,d_Lb);
+  Pathcalc_Portfolio_KernelGPU<<<dimGrid, dimBlock>>>(d_v,d_Lb);
   CUT_CHECK_ERROR("Pathcalc_Portfolio_kernelGPU() execution failed\n");
   CUDA_SAFE_CALL( cudaThreadSynchronize() );
 

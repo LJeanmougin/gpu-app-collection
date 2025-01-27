@@ -131,8 +131,8 @@ __global__ void cuda_initialize_variables(int nelr, double* variables)
 void initialize_variables(int nelr, double* variables)
 {
 	dim3 Dg(nelr / block_length), Db(block_length);
-	// cuda_initialize_variables<<<1, Db>>>(nelr, variables);
-	cuda_initialize_variables<<<1, 32>>>(nelr, variables);
+	// cuda_initialize_variables<<<Dg, Db>>>(nelr, variables);
+	cuda_initialize_variables<<<1, Db>>>(nelr, variables);
 	cudaError_t error = cudaGetLastError();
 	if (error != cudaSuccess) 
 	  {
@@ -207,8 +207,8 @@ __global__ void cuda_compute_step_factor(int nelr, double* variables, double* ar
 void compute_step_factor(int nelr, double* variables, double* areas, double* step_factors)
 {
 	dim3 Dg(nelr / block_length), Db(block_length);
-	// cuda_compute_step_factor<<<1, Db>>>(nelr, variables, areas, step_factors);
-	cuda_compute_step_factor<<<1, 32>>>(nelr, variables, areas, step_factors);
+	// cuda_compute_step_factor<<<Dg, Db>>>(nelr, variables, areas, step_factors);
+	cuda_compute_step_factor<<<1, Db>>>(nelr, variables, areas, step_factors);
 	cudaError_t error = cudaGetLastError();		
 	if (error != cudaSuccess) 
 	  {
@@ -355,8 +355,8 @@ __global__ void cuda_compute_flux(int nelr, int* elements_surrounding_elements, 
 void compute_flux(int nelr, int* elements_surrounding_elements, double* normals, double* variables, double* fluxes)
 {
 	dim3 Dg(nelr / block_length), Db(block_length);
-	// cuda_compute_flux<<<1,Db>>>(nelr, elements_surrounding_elements, normals, variables, fluxes);
-	cuda_compute_flux<<<1,32>>>(nelr, elements_surrounding_elements, normals, variables, fluxes);
+	// cuda_compute_flux<<<Dg,Db>>>(nelr, elements_surrounding_elements, normals, variables, fluxes);
+	cuda_compute_flux<<<1,Db>>>(nelr, elements_surrounding_elements, normals, variables, fluxes);
 	cudaError_t error = cudaGetLastError();
 	if (error != cudaSuccess) 
 	  {
@@ -381,8 +381,8 @@ __global__ void cuda_time_step(int j, int nelr, double* old_variables, double* v
 void time_step(int j, int nelr, double* old_variables, double* variables, double* step_factors, double* fluxes)
 {
 	dim3 Dg(nelr / block_length), Db(block_length);
-	// cuda_time_step<<<1,Db>>>(j, nelr, old_variables, variables, step_factors, fluxes);
-	cuda_time_step<<<1,32>>>(j, nelr, old_variables, variables, step_factors, fluxes);
+	// cuda_time_step<<<Dg,Db>>>(j, nelr, old_variables, variables, step_factors, fluxes);
+	cuda_time_step<<<1,Db>>>(j, nelr, old_variables, variables, step_factors, fluxes);
 	cudaError_t error = cudaGetLastError();
 	if (error != cudaSuccess) 
 	  {
@@ -397,7 +397,6 @@ void time_step(int j, int nelr, double* old_variables, double* variables, double
  */
 int main(int argc, char** argv)
 {
-	 
 	if (argc < 2)
 	{
 		std::cout << "specify data file name" << std::endl;

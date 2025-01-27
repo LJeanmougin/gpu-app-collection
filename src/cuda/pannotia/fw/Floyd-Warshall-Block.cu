@@ -171,10 +171,10 @@ int main(int argc, char **argv)
     double timer3 = gettime();
     // Main computation loop
     for (int blk = 0; blk < num_blk_per_dim && blk < MAX_ITERS; blk++) {
-        floydwarshall_dia_block<<<1, threads>>>(dist_d, blk, dim);
-        floydwarshall_strip_blocks_x<<<1, threads>>>(dist_d, blk, dim);
-        floydwarshall_strip_blocks_y<<<1, threads>>>(dist_d, blk, dim);
-        floydwarshall_remaining_blocks<<<1, threads>>>(dist_d, blk, dim);
+        floydwarshall_dia_block<<<grid_dia, threads>>>(dist_d, blk, dim);
+        floydwarshall_strip_blocks_x<<<grid_strip_x, threads>>>(dist_d, blk, dim);
+        floydwarshall_strip_blocks_y<<<grid_strip_y, threads>>>(dist_d, blk, dim);
+        floydwarshall_remaining_blocks<<<grid_remain, threads>>>(dist_d, blk, dim);
     }
     cudaThreadSynchronize();
 

@@ -229,9 +229,8 @@ void compute_tran_temp(float *MatrixPower,float *MatrixTemp, int col, int row, \
 	time_elapsed=0.001;
 
 	for (t = 0; t < total_iterations; t+=num_iterations) {
-        // L.Jeanmougin : 1 Block 32 Threads
-	calculate_temp<<<1, dimBlock>>>(MIN(num_iterations, total_iterations-t), MatrixPower,MatrixTemp,
-	    // calculate_temp<<<1, 32>>>(MIN(num_iterations, total_iterations-t), MatrixPower,MatrixTemp,\
+	// calculate_temp<<<dimGrid, dimBlock>>>(MIN(num_iterations, total_iterations-t), MatrixPower,MatrixTemp,
+	calculate_temp<<<1, dimBlock>>>(MIN(num_iterations, total_iterations-t), MatrixPower,MatrixTemp,\
 		col,row,borderCols, borderRows, Cap,Rx,Ry,Rz,step,time_elapsed);
 	}
 }
@@ -281,8 +280,8 @@ void run(int argc, char** argv)
     int borderRows = (pyramid_height)*EXPAND_RATE/2;
     int smallBlockCol = BLOCK_SIZE-(pyramid_height)*EXPAND_RATE;
     int smallBlockRow = BLOCK_SIZE-(pyramid_height)*EXPAND_RATE;
-    int blockCols = 1; // CHANGING SO NUMBER OF BLOCKS IS 1 ----------- grid_cols/smallBlockCol+((grid_cols%smallBlockCol==0)?0:1);
-    int blockRows = 1; // CHANGING SO NUMBER OF BLOCKS IS 1 -----------  grid_rows/smallBlockRow+((grid_rows%smallBlockRow==0)?0:1);
+    int blockCols = grid_cols/smallBlockCol+((grid_cols%smallBlockCol==0)?0:1);
+    int blockRows = grid_rows/smallBlockRow+((grid_rows%smallBlockRow==0)?0:1);
 
     FilesavingTemp = (float *) malloc(size*sizeof(float));
     FilesavingPower = (float *) malloc(size*sizeof(float));

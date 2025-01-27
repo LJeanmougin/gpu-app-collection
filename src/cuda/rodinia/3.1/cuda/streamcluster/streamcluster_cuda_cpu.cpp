@@ -851,7 +851,6 @@ void streamCluster( PStream* stream,
 
 int main(int argc, char **argv)
 {
-	 
   char *outfilename = new char[MAXNAMESIZE];
   char *infilename = new char[MAXNAMESIZE];
   long kmin, kmax, n, chunksize, clustersize;

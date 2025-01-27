@@ -970,43 +970,42 @@ int main(int argc, char *argv[])
 
     for (step = 0; step < timesteps; step++) {
       cudaEventRecord(start, 0);
-      BoundingBoxKernel<<<1, THREADS1>>>(nnodes, nbodies, startl, childl, massl, posxl, posyl, poszl, maxxl, maxyl, maxzl, minxl, minyl, minzl);
+      BoundingBoxKernel<<<blocks * FACTOR1, THREADS1>>>(nnodes, nbodies, startl, childl, massl, posxl, posyl, poszl, maxxl, maxyl, maxzl, minxl, minyl, minzl);
       cudaEventRecord(stop, 0);  cudaEventSynchronize(stop);  cudaEventElapsedTime(&time, start, stop);
       timing[1] += time;
       CudaTest("kernel 1 launch failed");
 
       cudaEventRecord(start, 0);
-      ClearKernel1<<<1, 1024>>>(nnodes, nbodies, childl);
-      TreeBuildingKernel<<<1, THREADS2>>>(nnodes, nbodies, errl, childl, posxl, posyl, poszl);
-      ClearKernel2<<<1, 1024>>>(nnodes, startl, massl);
+      ClearKernel1<<<blocks * 1, 1024>>>(nnodes, nbodies, childl);
+      TreeBuildingKernel<<<blocks * FACTOR2, THREADS2>>>(nnodes, nbodies, errl, childl, posxl, posyl, poszl);
+      ClearKernel2<<<blocks * 1, 1024>>>(nnodes, startl, massl);
       cudaEventRecord(stop, 0);  cudaEventSynchronize(stop);  cudaEventElapsedTime(&time, start, stop);
       timing[2] += time;
       CudaTest("kernel 2 launch failed");
 
       cudaEventRecord(start, 0);
-      SummarizationKernel<<<1, THREADS3>>>(nnodes, nbodies, countl, childl, massl, posxl, posyl, poszl);
+      SummarizationKernel<<<blocks * FACTOR3, THREADS3>>>(nnodes, nbodies, countl, childl, massl, posxl, posyl, poszl);
       cudaEventRecord(stop, 0);  cudaEventSynchronize(stop);  cudaEventElapsedTime(&time, start, stop);
       timing[3] += time;
       CudaTest("kernel 3 launch failed");
 
       cudaEventRecord(start, 0);
-      SortKernel<<<1, THREADS4>>>(nnodes, nbodies, sortl, countl, startl, childl);
+      SortKernel<<<blocks * FACTOR4, THREADS4>>>(nnodes, nbodies, sortl, countl, startl, childl);
       cudaEventRecord(stop, 0);  cudaEventSynchronize(stop);  cudaEventElapsedTime(&time, start, stop);
       timing[4] += time;
       CudaTest("kernel 4 launch failed");
 
       cudaEventRecord(start, 0);
-      ForceCalculationKernel<<<1, THREADS5>>>(nnodes, nbodies, errl, dthf, itolsq, epssq, sortl, childl, massl, posxl, posyl, poszl, velxl, velyl, velzl, accxl, accyl, acczl);
+      ForceCalculationKernel<<<blocks * FACTOR5, THREADS5>>>(nnodes, nbodies, errl, dthf, itolsq, epssq, sortl, childl, massl, posxl, posyl, poszl, velxl, velyl, velzl, accxl, accyl, acczl);
       cudaEventRecord(stop, 0);  cudaEventSynchronize(stop);  cudaEventElapsedTime(&time, start, stop);
       timing[5] += time;
       CudaTest("kernel 5 launch failed");
 
       cudaEventRecord(start, 0);
-      IntegrationKernel<<<1, THREADS6>>>(nbodies, dtime, dthf, posxl, posyl, poszl, velxl, velyl, velzl, accxl, accyl, acczl);
+      IntegrationKernel<<<blocks * FACTOR6, THREADS6>>>(nbodies, dtime, dthf, posxl, posyl, poszl, velxl, velyl, velzl, accxl, accyl, acczl);
       cudaEventRecord(stop, 0);  cudaEventSynchronize(stop);  cudaEventElapsedTime(&time, start, stop);
       timing[6] += time;
       CudaTest("kernel 6 launch failed");
-      break; // L.JEANMOUGIN
     }
     CudaTest("kernel launch failed");
     cudaEventDestroy(start);  cudaEventDestroy(stop);

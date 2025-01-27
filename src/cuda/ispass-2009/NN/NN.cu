@@ -307,19 +307,19 @@ void NeuralNetwork()
 	printf("NUM=%d\n", NUM);
 	dim3 Layer1_Block(6,NUM,1);
 	dim3 Layer1_Thread(13,13);
-	executeFirstLayer<<<1,Layer1_Thread>>>(Layer1_Neurons_GPU,Layer1_Weights_GPU,Layer2_Neurons_GPU);
+	executeFirstLayer<<<Layer1_Block,Layer1_Thread>>>(Layer1_Neurons_GPU,Layer1_Weights_GPU,Layer2_Neurons_GPU);
 
 	dim3 Layer2_Block(50,NUM,1);
 	dim3 Layer2_Thread(5,5);
-	executeSecondLayer<<<1,Layer2_Thread>>>(Layer2_Neurons_GPU, Layer2_Weights_GPU,Layer3_Neurons_GPU);
+	executeSecondLayer<<<Layer2_Block,Layer2_Thread>>>(Layer2_Neurons_GPU, Layer2_Weights_GPU,Layer3_Neurons_GPU);
 
 	dim3 Layer3_Block(100,NUM,1);
 	dim3 Layer3_Thread(1,1);
-	executeThirdLayer<<<1,Layer3_Thread>>>(Layer3_Neurons_GPU, Layer3_Weights_GPU,Layer4_Neurons_GPU);
+	executeThirdLayer<<<Layer3_Block,Layer3_Thread>>>(Layer3_Neurons_GPU, Layer3_Weights_GPU,Layer4_Neurons_GPU);
 
 	dim3 Layer4_Block(10,NUM,1);
 	dim3 Layer4_Thread(1,1);
-	executeFourthLayer<<<1,Layer4_Thread>>>(Layer4_Neurons_GPU,Layer4_Weights_GPU,Layer5_Neurons_GPU);
+	executeFourthLayer<<<Layer4_Block,Layer4_Thread>>>(Layer4_Neurons_GPU,Layer4_Weights_GPU,Layer5_Neurons_GPU);
 
 	CUT_CHECK_ERROR("Kernel execution failed");
 

@@ -164,7 +164,7 @@ void convolution3DCuda(DATA_TYPE* A, DATA_TYPE* B, DATA_TYPE* B_outputFromGpu)
 	int i;
 	for (i = 1; i < NI - 1; ++i) // 0
 	{
-		convolution3D_kernel<<< 1, block >>>(A_gpu, B_gpu, i);
+		convolution3D_kernel<<< grid, block >>>(A_gpu, B_gpu, i);
 	}
 
 	cudaThreadSynchronize();

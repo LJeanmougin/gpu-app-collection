@@ -119,7 +119,6 @@ void write_data(	char* filename,
 //===============================================================================================================================================================================================================
 int main(int argc, char *argv []){
 
-	 
   printf("WG size of kernel = %d \n", NUMBER_THREADS);
 	//======================================================================================================================================================
 	//	VARIABLES
@@ -660,8 +659,8 @@ int main(int argc, char *argv []){
 		cudaMemcpyToSymbol(d_common_change, &common_change, sizeof(params_common_change));
 
 		// launch GPU kernel
-		// kernel<<<1, threads>>>();
-		kernel<<<1, 32>>>();
+		// kernel<<<blocks, threads>>>();
+		kernel<<<1, threads>>>();
 
 		// free frame after each loop iteration, since AVI library allocates memory for every frame fetched
 		free(frame);

@@ -485,17 +485,17 @@ int converge(GPUCSRGraph &g_cl, GPUCSRGraph &g_vars, Edge &g_ed, float *g_max_ep
   const size_t ue_res = maximum_residency(update_eta, 384, 0);
     
   do {
-    calc_pi_values<<<1, 384>>>(g_cl, g_vars, g_ed);
+    calc_pi_values<<<nSM * cpv_res, 384>>>(g_cl, g_vars, g_ed);
 
     max_eps = 0;    
     CUDA_SAFE_CALL(cudaMemcpy(g_max_eps, &max_eps, 
 			      sizeof(float), cudaMemcpyHostToDevice));
 
-    update_eta<<<1, 384>>>(g_cl, g_vars, g_ed, g_max_eps);
+    update_eta<<<nSM * ue_res, 384>>>(g_cl, g_vars, g_ed, g_max_eps);
     
     CUDA_SAFE_CALL(cudaMemcpy(&max_eps, g_max_eps, 
 			      sizeof(float), cudaMemcpyDeviceToHost));
-    break;
+    
   } while(max_eps > EPSILON && i++ < MAXITERATION);
 
   if(max_eps <= EPSILON) {
@@ -523,7 +523,7 @@ int build_list(GPUCSRGraph &g_cl, GPUCSRGraph &g_vars, Edge &g_ed, float *g_summ
 
   bias_list_len = 0;
   CUDA_SAFE_CALL(cudaMemcpy(g_bias_list_len, &bias_list_len, sizeof(int) * 1, cudaMemcpyHostToDevice));
-  update_bias<<<1, 384>>>(g_cl, g_vars, g_ed, db_bias_list.Current(), 
+  update_bias<<<nSM * updb_res, 384>>>(g_cl, g_vars, g_ed, db_bias_list.Current(), 
 				       db_bias_list_vars.Current(), g_bias_list_len, g_summag);
   CUDA_SAFE_CALL(cudaMemcpy(&summag, g_summag, sizeof(summag), cudaMemcpyDeviceToHost));
 
@@ -595,9 +595,9 @@ int main(int argc, char *argv[])
 		  canfix))
       break;
     
-    decimate_2<<<1,384>>>(g_cl, g_vars, g_ed, 
+    decimate_2<<<d2_res * nSM,384>>>(g_cl, g_vars, g_ed, 
 				      db_bias_list_vars.Current(), g_bias_list_len, canfix);
-    break;
+
   };
   CUDA_SAFE_CALL(cudaDeviceSynchronize());
   endtime = rtclock();
