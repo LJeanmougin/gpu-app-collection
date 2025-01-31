@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <math.h>
 
-#define BSIZE 1024
+#define BSIZE 32
 
 __global__ void sgemm_naive(int M, int N, int K, float alpha, const float *A, 
                             const float *B, float beta, float *C)
@@ -33,7 +33,7 @@ int main()
     }
 
     dim3 gridDim(1, 1, 1);
-    dim3 blockDim(32, 32, 1);
+    dim3 blockDim(8, 8, 1);
 
     cudaMalloc((void **) &d_mat_A, BSIZE * sizeof(float));
     cudaMalloc((void **) &d_mat_B, BSIZE * sizeof(float));
