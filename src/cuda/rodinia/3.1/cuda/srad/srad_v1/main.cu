@@ -303,7 +303,8 @@ int main(int argc, char *argv []){
 	// printf("iterations: ");
 
 	// execute main loop
-	for (iter=0; iter<niter; iter++){										// do for the number of iterations input parameter
+	for (iter=0; iter<5; iter++){
+		// for (iter=0; iter<niter; iter++){										// do for the number of iterations input parameter
 
 	// printf("%d ", iter);
 	// fflush(NULL);
@@ -353,7 +354,7 @@ int main(int argc, char *argv []){
 			}
 
 			checkCUDAError("after reduce");
-
+			break;
 		}
 
 		checkCUDAError("before copy sum");
