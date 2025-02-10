@@ -324,7 +324,8 @@ int main(int argc, char *argv []){
 		no = Ne;														// original number of sum elements
 		mul = 1;														// original multiplier
 
-		while(blocks2.x != 0){
+		// while(blocks2.x != 0){
+		do{
 
 			checkCUDAError("before reduce");
 
@@ -354,8 +355,7 @@ int main(int argc, char *argv []){
 			}
 
 			checkCUDAError("after reduce");
-			break;
-		}
+		} while(0);
 
 		checkCUDAError("before copy sum");
 
