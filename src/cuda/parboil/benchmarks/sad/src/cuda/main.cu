@@ -330,7 +330,8 @@ main(int argc, char **argv)
 
     /* Run the 4x4 kernel */
     mb_sad_calc<<<1,
-      dim3(CEIL(MAX_POS, POS_PER_THREAD) * THREADS_W * THREADS_H),
+    // dim3(CEIL(MAX_POS, POS_PER_THREAD) * THREADS_W * THREADS_H),
+    32,
       SAD_LOC_SIZE_BYTES>>>
       (d_sads,
        (unsigned short *)d_cur_image,
@@ -339,13 +340,15 @@ main(int argc, char **argv)
     CUDA_ERRCK
 
     /* Run the larger-blocks kernels */
-    larger_sad_calc_8<<<1, dim3(32, 4)>>>
+    // larger_sad_calc_8<<<1, dim3(32, 4)>>>
+    larger_sad_calc_8<<<1, 32>>>
       (d_sads,
        image_width_macroblocks,
        image_height_macroblocks);
     CUDA_ERRCK
 
-    larger_sad_calc_16<<<1, dim3(32, 1)>>>
+    // larger_sad_calc_16<<<1, dim3(32, 1)>>>
+    larger_sad_calc_16<<<1, 32>>>
       (d_sads,
        image_width_macroblocks,
        image_height_macroblocks);

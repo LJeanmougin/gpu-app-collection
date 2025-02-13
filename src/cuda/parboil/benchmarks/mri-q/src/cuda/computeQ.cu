@@ -105,7 +105,8 @@ void computePhiMag_GPU(int numK, float* phiR_d, float* phiI_d, float* phiMag_d)
   dim3 DimPhiMagBlock(KERNEL_PHI_MAG_THREADS_PER_BLOCK, 1);
   dim3 DimPhiMagGrid(phiMagBlocks, 1);
 
-  ComputePhiMag_GPU <<< 1, DimPhiMagBlock >>> 
+  // ComputePhiMag_GPU <<< 1, DimPhiMagBlock >>> 
+  ComputePhiMag_GPU <<< 1, 32 >>> 
     (phiR_d, phiI_d, phiMag_d, numK);
 }
 
