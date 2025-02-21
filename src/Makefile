@@ -44,8 +44,7 @@ rodinia_2.0-ft:
 # ECRTS_2025 Paper experiments. 
 ###################################################################################################3
 ecrts_2025:
-	$(SETENV) make $(MAKE_ARGS) -C cuda/ecrts_2025/vecadd
-	$(SETENV) make $(MAKE_ARGS) -C cuda/ecrts_2025/sgemm_naive
+	$(SETENV) make $(MAKE_ARGS) -C cuda/ecrts_2025/sgemm
 
 
 ###################################################################################################3
