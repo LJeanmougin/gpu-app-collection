@@ -25,6 +25,7 @@
 // SOFTWARE.
 
 #define BLOCKSIZE 32
+#define WARP_COUNT 4
 
 #define CEIL_DIV(M, N) (((M) + (N)-1) / (N))
 
@@ -35,13 +36,18 @@ __global__ void sgemm_shmem(int M, int N, int K, float alpha, const float *A,
   const uint cRow = blockIdx.x;
   const uint cCol = blockIdx.y;
 
-  // allocate buffer for current block in fast shared mem
+  // allocate buffer for load block in fast shared mem
   // shared mem is shared between all threads in a block
   __shared__ float As_1[BLOCKSIZE * BLOCKSIZE];
   __shared__ float As_2[BLOCKSIZE * BLOCKSIZE];
   __shared__ float Bs_1[BLOCKSIZE * BLOCKSIZE];
   __shared__ float Bs_2[BLOCKSIZE * BLOCKSIZE];
+  float *load_A = As_1;
+  float *load_B = Bs_1;
+  float *process_A = As_2;
+  float *process_B = Bs_2;
 
+  float tmpA, tmpB;
   // the inner row & col that we're accessing in this thread
   const uint threadCol = threadIdx.x % BLOCKSIZE;
   const uint threadRow = threadIdx.x / BLOCKSIZE;
@@ -52,56 +58,37 @@ __global__ void sgemm_shmem(int M, int N, int K, float alpha, const float *A,
   C += cRow * BLOCKSIZE * N + cCol * BLOCKSIZE; // row=cRow, col=cCol
 
   float tmp = 0.0;
-  As_1[threadRow * BLOCKSIZE + threadCol] = A[threadCol * K + threadCol];
-  Bs_1[threadRow * BLOCKSIZE + threadCol] = B[threadRow * N + threadCol];
+  load_A[threadRow * BLOCKSIZE + threadCol] = A[threadCol * K + threadCol];
+  load_B[threadRow * BLOCKSIZE + threadCol] = B[threadRow * N + threadCol];
   int bkIdx;
-  for (bkIdx = 0; bkIdx < K - 1; bkIdx += BLOCKSIZE) {
+  __syncthreads();
+  for (bkIdx = 0; bkIdx < K; bkIdx += BLOCKSIZE) {
     // Have each thread load one of the elements in A & B
     // Make the threadCol (=threadIdx.x) the consecutive index
     // to allow global memory access coalescing
-    if(bkIdx % 2 == 0) // Do stuff with As_1 and Bs_1
-    {
-      // Advancing global mem pointers
-      A += BLOCKSIZE;
-      B += BLOCKSIZE * N;
-      // Loading for next loop
-      As_2[threadRow * BLOCKSIZE + threadCol] = A[threadRow * K + threadCol];
-      Bs_2[threadRow * BLOCKSIZE + threadCol] = B[threadRow * N + threadCol];
-      // execute the dotproduct on the currently cached block
-      for (int dotIdx = 0; dotIdx < BLOCKSIZE; ++dotIdx) {
-        tmp += As_1[threadRow * BLOCKSIZE + dotIdx] *
-              Bs_1[dotIdx * BLOCKSIZE + threadCol];
-      }
-    } else { // Do stuff with As_2 and Bs_2
-      // Advancing global mem pointers
-      A += BLOCKSIZE;
-      B += BLOCKSIZE * N;
-      // Loading for next loop
-      As_1[threadRow * BLOCKSIZE + threadCol] = A[threadRow * K + threadCol];
-      Bs_1[threadRow * BLOCKSIZE + threadCol] = B[threadRow * N + threadCol];
-      // execute the dotproduct on the currently cached block
-      for (int dotIdx = 0; dotIdx < BLOCKSIZE; ++dotIdx) {
-        tmp += As_2[threadRow * BLOCKSIZE + dotIdx] *
-              Bs_2[dotIdx * BLOCKSIZE + threadCol];
-      }
+    
+    load_A = load_A == As_1 ? As_2 : As_1;
+    load_B = load_B == Bs_1 ? Bs_2 : Bs_1;
+    process_A = load_A == As_1 ? As_2 : As_1;
+    process_B = load_B == Bs_1 ? Bs_2 : Bs_1;
+    // Advancing global mem pointers
+    A += BLOCKSIZE;
+    B += BLOCKSIZE * N;
+    // Loading for next loop
+    tmpA = A[threadRow * K + threadCol];
+    tmpB = B[threadRow * N + threadCol];
+    // execute the dotproduct on the loadly cached block
+    for (int dotIdx = 0; dotIdx < BLOCKSIZE; ++dotIdx) {
+      tmp += process_A[threadRow * BLOCKSIZE + dotIdx] *
+            process_B[dotIdx * BLOCKSIZE + threadCol];
     }
     // block threads in this block until cache is fully populated
     // need to sync again at the end, to avoid faster threads
     // fetching the next block into the cache before slower threads are done
+    // __syncthreads();
+    load_A[threadRow * BLOCKSIZE + threadCol] = tmpA;
+    load_B[threadRow * BLOCKSIZE + threadCol] = tmpB;
     __syncthreads();
-  }
-  bkIdx ++;
-  if (bkIdx % 2 == 0)
-  {
-    for (int dotIdx = 0; dotIdx < BLOCKSIZE; ++dotIdx) {
-      tmp += As_1[threadRow * BLOCKSIZE + dotIdx] *
-            Bs_1[dotIdx * BLOCKSIZE + threadCol];
-    }
-  } else {
-    for (int dotIdx = 0; dotIdx < BLOCKSIZE; ++dotIdx) {
-      tmp += As_2[threadRow * BLOCKSIZE + dotIdx] *
-            Bs_2[dotIdx * BLOCKSIZE + threadCol];
-    }
   }
   C[threadRow * N + threadCol] =
       alpha * tmp + beta * C[threadRow * N + threadCol];
@@ -120,8 +107,8 @@ int main()
 {
     float *dA, *dB, *dC;
     int M, N, K;
-    M = 32;
-    N = 32;
+    M = WARP_COUNT;
+    N = WARP_COUNT;
     K = 32;
     float hA[M * K];
     float hB[N * K];
@@ -129,7 +116,7 @@ int main()
     
 
     dim3 gridDim(1, 1, 1);
-    dim3 blockDim( 32, 4, 1);
+    dim3 blockDim( 32, WARP_COUNT, 1);
     
     generate_matrix(hA, M * K);
     generate_matrix(hB, N * K);
