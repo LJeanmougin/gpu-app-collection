@@ -320,7 +320,8 @@ namespace dwt_cuda {
     
     // finally transform this level
     PERF_BEGIN
-    rdwt53Kernel<WIN_SX, WIN_SY><<<1, WIN_SX>>>(in, out, sx, sy, steps);
+    // rdwt53Kernel<WIN_SX, WIN_SY><<<1, WIN_SX>>>(in, out, sx, sy, steps);
+    rdwt53Kernel<WIN_SX, WIN_SY><<<1, 32>>>(in, out, sx, sy, steps);
     PERF_END("        RDWT53", sx, sy)
     CudaDWTTester::checkLastKernelCall("RDWT 5/3 kernel");
   }

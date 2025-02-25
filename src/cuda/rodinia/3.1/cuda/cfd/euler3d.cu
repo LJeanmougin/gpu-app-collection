@@ -184,7 +184,8 @@ __global__ void cuda_initialize_variables(int nelr, float* variables)
 void initialize_variables(int nelr, float* variables)
 {
 	dim3 Dg(nelr / BLOCK_SIZE_1), Db(BLOCK_SIZE_1);
-	cuda_initialize_variables<<<1, Db>>>(nelr, variables);
+	// cuda_initialize_variables<<<1, Db>>>(nelr, variables);
+	cuda_initialize_variables<<<1, 32>>>(nelr, variables);
 //	getLastCudaError("initialize_variables failed");
 }
 
@@ -254,7 +255,8 @@ __global__ void cuda_compute_step_factor(int nelr, float* variables, float* area
 void compute_step_factor(int nelr, float* variables, float* areas, float* step_factors)
 {
 	dim3 Dg(nelr / BLOCK_SIZE_2), Db(BLOCK_SIZE_2);
-	cuda_compute_step_factor<<<1, Db>>>(nelr, variables, areas, step_factors);		
+	// cuda_compute_step_factor<<<1, Db>>>(nelr, variables, areas, step_factors);		
+	cuda_compute_step_factor<<<1, 32>>>(nelr, variables, areas, step_factors);		
 	//getLastCudaError("compute_step_factor failed");
 }
 
@@ -395,7 +397,8 @@ __global__ void cuda_compute_flux(int nelr, int* elements_surrounding_elements, 
 void compute_flux(int nelr, int* elements_surrounding_elements, float* normals, float* variables, float* fluxes)
 {
 	dim3 Dg(nelr / BLOCK_SIZE_3), Db(BLOCK_SIZE_3);
-	cuda_compute_flux<<<1,Db>>>(nelr, elements_surrounding_elements, normals, variables, fluxes);
+	// cuda_compute_flux<<<1,Db>>>(nelr, elements_surrounding_elements, normals, variables, fluxes);
+	cuda_compute_flux<<<1,32>>>(nelr, elements_surrounding_elements, normals, variables, fluxes);
 	//getLastCudaError("compute_flux failed");
 }
 
@@ -414,7 +417,8 @@ __global__ void cuda_time_step(int j, int nelr, float* old_variables, float* var
 void time_step(int j, int nelr, float* old_variables, float* variables, float* step_factors, float* fluxes)
 {
 	dim3 Dg(nelr / BLOCK_SIZE_4), Db(BLOCK_SIZE_4);
-	cuda_time_step<<<1,Db>>>(j, nelr, old_variables, variables, step_factors, fluxes);
+	// cuda_time_step<<<1,Db>>>(j, nelr, old_variables, variables, step_factors, fluxes);
+	cuda_time_step<<<1,32>>>(j, nelr, old_variables, variables, step_factors, fluxes);
 	//getLastCudaError("update failed");
 }
 
