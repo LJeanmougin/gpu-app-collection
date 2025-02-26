@@ -188,7 +188,8 @@ void calcPivotPoints(float *histogram, int histosize, int listsize,
 			pivotPoints[p_idx++] = startsAt + (we_need/histogram[i]) * histo_width;
 			startsAt += (we_need/histogram[i]) * histo_width; 
 			histogram[i] -= we_need; 
-			we_need = elemsPerSlice; 
+			we_need = elemsPerSlice;
+			break; // L.Jeanmougin
 		}
 		// grab what we can from what remains of it
 		we_need -= histogram[i]; 
@@ -199,6 +200,7 @@ void calcPivotPoints(float *histogram, int histosize, int listsize,
 	while(p_idx < divisions){
 		pivotPoints[p_idx] = pivotPoints[p_idx-1]; 
 		p_idx++; 
+		break; // L.Jeanmougin
 	}
 }
 

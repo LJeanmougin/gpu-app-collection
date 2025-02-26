@@ -89,6 +89,7 @@ float4* runMergeSort(int listsize, int divisions,
 		nrElems *= 2; 
 		floatsperthread = (nrElems*4); 
 		if(threadsPerDiv == 1) break; 
+		break; // L.Jeanmougin
 	}
 	////////////////////////////////////////////////////////////////////////////
 	// Now, get rid of the NULL elements
