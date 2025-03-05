@@ -24,12 +24,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#define BLOCKSIZE 32
-#define WARP_COUNT 4
-
+#include "../sgemm_config.h"
 #define CEIL_DIV(M, N) (((M) + (N)-1) / (N))
 
-__global__ void sgemm_shmem(int M, int N, int K, float alpha, const float *A, 
+__global__ void sgemm_double_buff(int M, int N, int K, float alpha, const float *A, 
                       const float *B, float beta, float *C)
 {
   // the output block that we want to compute in this threadblock
@@ -62,7 +60,7 @@ __global__ void sgemm_shmem(int M, int N, int K, float alpha, const float *A,
   load_B[threadRow * BLOCKSIZE + threadCol] = B[threadRow * N + threadCol];
   int bkIdx;
   __syncthreads();
-  for (bkIdx = 0; bkIdx < K; bkIdx += BLOCKSIZE) {
+  for (bkIdx = 0; bkIdx < K - 1; bkIdx += BLOCKSIZE) {
     // Have each thread load one of the elements in A & B
     // Make the threadCol (=threadIdx.x) the consecutive index
     // to allow global memory access coalescing
@@ -90,6 +88,12 @@ __global__ void sgemm_shmem(int M, int N, int K, float alpha, const float *A,
     load_B[threadRow * BLOCKSIZE + threadCol] = tmpB;
     __syncthreads();
   }
+  process_A = load_A == As_1 ? As_2 : As_1;
+  process_B = load_B == Bs_1 ? Bs_2 : Bs_1;
+  for (int dotIdx = 0; dotIdx < BLOCKSIZE; ++dotIdx) {
+    tmp += process_A[threadRow * BLOCKSIZE + dotIdx] *
+          process_B[dotIdx * BLOCKSIZE + threadCol];
+  }
   C[threadRow * N + threadCol] =
       alpha * tmp + beta * C[threadRow * N + threadCol];
 }
@@ -109,7 +113,7 @@ int main()
     int M, N, K;
     M = WARP_COUNT;
     N = WARP_COUNT;
-    K = 32;
+    K = LINE_SIZE;
     float hA[M * K];
     float hB[N * K];
     float hC[M * N];
@@ -130,7 +134,7 @@ int main()
     cudaMemcpy(dB, hB, sizeof(float) * K * N, cudaMemcpyHostToDevice);
     cudaMemcpy(dC, hC, sizeof(float) * M * N, cudaMemcpyHostToDevice);
 
-    sgemm_shmem<<< gridDim, blockDim >>>(M, N, K,0.5f, dA, dB, 0.5f, dC);
+    sgemm_double_buff<<< gridDim, blockDim >>>(M, N, K,0.5f, dA, dB, 0.5f, dC);
 
     cudaMemcpy(hC, dC, sizeof(float) * M * N, cudaMemcpyDeviceToHost);
 

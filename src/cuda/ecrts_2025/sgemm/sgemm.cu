@@ -24,7 +24,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#define BLOCKSIZE 32
+#include "../sgemm_config.h"
 
 #define CEIL_DIV(M, N) (((M) + (N)-1) / (N))
 
@@ -64,15 +64,15 @@ __global__ void sgemm_shmem(int M, int N, int K, float alpha, const float *A,
 
     // execute the dotproduct on the currently cached block
     for (int dotIdx = 0; dotIdx < BLOCKSIZE; ++dotIdx) {
-      tmp += As[threadRow * BLOCKSIZE + dotIdx] *
-             Bs[dotIdx * BLOCKSIZE + threadCol];
+    tmp += As[threadRow * BLOCKSIZE + dotIdx] *
+    Bs[dotIdx * BLOCKSIZE + threadCol];
     }
     // need to sync again at the end, to avoid faster threads
     // fetching the next block into the cache before slower threads are done
     __syncthreads();
   }
   C[threadRow * N + threadCol] =
-      alpha * tmp + beta * C[threadRow * N + threadCol];
+  alpha * tmp + beta * C[threadRow * N + threadCol];
 }
 
 void generate_matrix(float *mat, int size)
@@ -88,16 +88,16 @@ int main()
 {
     float *dA, *dB, *dC;
     int M, N, K;
-    M = 4;
-    N = 4;
-    K = 32;
+    M = WARP_COUNT;
+    N = WARP_COUNT;
+    K = LINE_SIZE;
     float hA[M * K];
     float hB[N * K];
     float hC[M * N];
     
 
     dim3 gridDim(1, 1, 1);
-    dim3 blockDim( 32, 4, 1);
+    dim3 blockDim( 32, WARP_COUNT, 1);
     
     generate_matrix(hA, M * K);
     generate_matrix(hB, N * K);
