@@ -43,9 +43,21 @@ rodinia_2.0-ft:
 ###################################################################################################3
 # ECRTS_2025 Paper experiments. 
 ###################################################################################################3
-ecrts_2025:
-	$(SETENV) make $(MAKE_ARGS) -C cuda/ecrts_2025/sgemm
-	$(SETENV) make $(MAKE_ARGS) -C cuda/ecrts_2025/sgemm_double_buff
+sgemm_4w:
+	$(SETENV) make $(MAKE_ARGS) -C cuda/sgemm_4w/sgemm
+	$(SETENV) make $(MAKE_ARGS) -C cuda/sgemm_4w/sgemm_double_buff
+
+sgemm_8w:
+	$(SETENV) make $(MAKE_ARGS) -C cuda/sgemm_8w/sgemm
+	$(SETENV) make $(MAKE_ARGS) -C cuda/sgemm_8w/sgemm_double_buff
+
+sgemm_16w:
+	$(SETENV) make $(MAKE_ARGS) -C cuda/sgemm_16w/sgemm
+	$(SETENV) make $(MAKE_ARGS) -C cuda/sgemm_16w/sgemm_double_buff
+
+sgemm_32w:
+	$(SETENV) make $(MAKE_ARGS) -C cuda/sgemm_32w/sgemm
+	$(SETENV) make $(MAKE_ARGS) -C cuda/sgemm_32w/sgemm_double_buff
 
 
 ###################################################################################################3

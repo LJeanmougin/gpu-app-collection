@@ -34,9 +34,9 @@
 ################################################################################
 
 # Add source files here
-EXECUTABLE	:= sgemm_double_buff
+EXECUTABLE	:= sgemm_32w
 # CUDA source files (compiled with cudacc)
-CUFILES		:= sgemm_double_buff.cu
+CUFILES		:= sgemm.cu
 # CUDA dependency files
 # CU_DEPS		:= backprop_cuda_kernel.cu
 # C/C++ source files (compiled with gcc / c++)

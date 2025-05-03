@@ -34,7 +34,7 @@
 ################################################################################
 
 # Add source files here
-EXECUTABLE	:= sgemm
+EXECUTABLE	:= sgemm_4w
 # CUDA source files (compiled with cudacc)
 CUFILES		:= sgemm.cu
 # CUDA dependency files
@@ -42,7 +42,8 @@ CUFILES		:= sgemm.cu
 # C/C++ source files (compiled with gcc / c++)
 # CFILES		:= facetrain.c imagenet.c backprop.c
 
-
+OMIT_CUTIL_LIB=1
+OMIT_SHRUTIL_LIB=1
 
 ################################################################################
 # Rules and targets
