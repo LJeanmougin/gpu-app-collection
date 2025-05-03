@@ -1,9 +1,9 @@
-# 1 "/tmp/tmpxft_0000130a_00000000-5_nn_cuda.compute_75.cudafe1.cpp"
+# 1 "/tmp/tmpxft_000046de_00000000-5_nn_cuda.compute_75.cudafe1.cpp"
 # 1 "<built-in>"
 # 1 "<command-line>"
 # 1 "/usr/include/stdc-predef.h" 1 3 4
 # 1 "<command-line>" 2
-# 1 "/tmp/tmpxft_0000130a_00000000-5_nn_cuda.compute_75.cudafe1.cpp"
+# 1 "/tmp/tmpxft_000046de_00000000-5_nn_cuda.compute_75.cudafe1.cpp"
 # 1 "nn_cuda.cu"
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
 # 1 "nn_cuda.cu"
@@ -29973,403 +29973,403 @@ void euclid(LatLong *d_locations, float *d_distances, int numRecords, float lat,
 int main(int argc, char *argv[])
 # 65 "nn_cuda.cu"
 {
-# 66 "nn_cuda.cu"
-int i = 0;
 # 67 "nn_cuda.cu"
-float lat, lng;
-# 68 "nn_cuda.cu"
-int quiet = 0, timing = 0, platform = 0, device = 0;
-# 70 "nn_cuda.cu"
-std::vector< record> records;
-# 71 "nn_cuda.cu"
-std::vector< latLong> locations;
-# 72 "nn_cuda.cu"
-char filename[100];
-# 73 "nn_cuda.cu"
-int resultsCount = 10;
-# 76 "nn_cuda.cu"
-if (parseCommandline(argc, argv, filename, &resultsCount, &lat, &lng, &quiet, &timing, &platform, &device))
-# 77 "nn_cuda.cu"
-{
-# 78 "nn_cuda.cu"
-printUsage();
-# 79 "nn_cuda.cu"
-return 0;
-# 80 "nn_cuda.cu"
-}
-# 82 "nn_cuda.cu"
-int numRecords = loadData(filename, records, locations);
-# 83 "nn_cuda.cu"
-if (resultsCount > numRecords) { resultsCount = numRecords; }
-# 90 "nn_cuda.cu"
-float *distances;
-# 92 "nn_cuda.cu"
-LatLong *d_locations;
-# 93 "nn_cuda.cu"
-float *d_distances;
-# 97 "nn_cuda.cu"
-cudaDeviceProp deviceProp;
-# 98 "nn_cuda.cu"
-cudaGetDeviceProperties(&deviceProp, 0);
-# 99 "nn_cuda.cu"
-cudaThreadSynchronize();
-# 100 "nn_cuda.cu"
-unsigned long maxGridX = (deviceProp.maxGridSize)[0];
-# 101 "nn_cuda.cu"
-unsigned long threadsPerBlock = ((deviceProp.maxThreadsPerBlock) > 256) ? 256 : (deviceProp.maxThreadsPerBlock);
-# 102 "nn_cuda.cu"
-size_t totalDeviceMemory;
-# 103 "nn_cuda.cu"
-size_t freeDeviceMemory;
-# 106 "nn_cuda.cu"
-freeDeviceMemory = ((512 * 1024) * 1024);
-# 107 "nn_cuda.cu"
-totalDeviceMemory = ((768 * 1024) * 1024);
-# 112 "nn_cuda.cu"
-cudaThreadSynchronize();
-# 113 "nn_cuda.cu"
-unsigned long usableDeviceMemory = (freeDeviceMemory * (85)) / (100);
-# 114 "nn_cuda.cu"
-unsigned long maxThreads = usableDeviceMemory / (12);
-# 115 "nn_cuda.cu"
-if (numRecords > maxThreads)
-# 116 "nn_cuda.cu"
-{
-# 117 "nn_cuda.cu"
-fprintf(stderr, "Error: Input too large.\n");
-# 118 "nn_cuda.cu"
-exit(1);
-# 119 "nn_cuda.cu"
-}
-# 120 "nn_cuda.cu"
-unsigned long blocks = ((numRecords + threadsPerBlock) - (1)) / threadsPerBlock;
-# 121 "nn_cuda.cu"
-unsigned long gridY = ((blocks + maxGridX) - (1)) / maxGridX;
-# 122 "nn_cuda.cu"
-unsigned long gridX = ((blocks + gridY) - (1)) / gridY;
-# 124 "nn_cuda.cu"
-dim3 gridDim(gridX, gridY);
-# 126 "nn_cuda.cu"
-if (false)
-# 127 "nn_cuda.cu"
-{
-# 128 "nn_cuda.cu"
-printf("totalDeviceMemory: %lu\n", (unsigned long)totalDeviceMemory);
-# 129 "nn_cuda.cu"
-printf("freeDeviceMemory: %lu\n", (unsigned long)freeDeviceMemory);
-# 130 "nn_cuda.cu"
-printf("usableDeviceMemory: %lu\n", (unsigned long)usableDeviceMemory);
-# 131 "nn_cuda.cu"
-printf("maxGridX: %lu\n", (unsigned long)maxGridX);
-# 132 "nn_cuda.cu"
-printf("deviceProp.maxThreadsPerBlock: %lu\n", (unsigned long)(deviceProp.maxThreadsPerBlock));
-# 133 "nn_cuda.cu"
-printf("threadsPerBlock: %lu\n", (unsigned long)threadsPerBlock);
-# 134 "nn_cuda.cu"
-printf("maxThreads: %lu\n", (unsigned long)maxThreads);
-# 135 "nn_cuda.cu"
-printf("blocks: %lu\n", (unsigned long)blocks);
-# 136 "nn_cuda.cu"
-printf("gridY: %lu\n", (unsigned long)gridY);
-# 137 "nn_cuda.cu"
-printf("gridX: %lu\n", (unsigned long)gridX);
-# 138 "nn_cuda.cu"
-}
-# 143 "nn_cuda.cu"
-distances = ((float *)malloc(sizeof(float) * numRecords));
-# 144 "nn_cuda.cu"
-cudaMalloc((void **)(&d_locations), sizeof(LatLong) * numRecords);
-# 145 "nn_cuda.cu"
-cudaMalloc((void **)(&d_distances), sizeof(float) * numRecords);
-# 150 "nn_cuda.cu"
-cudaMemcpy(d_locations, &locations[0], sizeof(LatLong) * numRecords, cudaMemcpyHostToDevice);
-# 155 "nn_cuda.cu"
-(__cudaPushCallConfiguration(gridDim, threadsPerBlock)) ? (void)0 : euclid(d_locations, d_distances, numRecords, lat, lng);
-# 156 "nn_cuda.cu"
-cudaThreadSynchronize();
-# 159 "nn_cuda.cu"
-cudaMemcpy(distances, d_distances, sizeof(float) * numRecords, cudaMemcpyDeviceToHost);
-# 162 "nn_cuda.cu"
-findLowest(records, distances, numRecords, resultsCount);
-# 165 "nn_cuda.cu"
-if (!quiet) {
-# 166 "nn_cuda.cu"
-for (i = 0; i < resultsCount; i++) {
-# 167 "nn_cuda.cu"
-printf("%s --> Distance=%f\n", records[i].recString, records[i].distance);
-# 168 "nn_cuda.cu"
-} }
-# 169 "nn_cuda.cu"
-free(distances);
-# 171 "nn_cuda.cu"
-cudaFree(d_locations);
-# 172 "nn_cuda.cu"
-cudaFree(d_distances); return 0;
-# 174 "nn_cuda.cu"
-}
-# 176 "nn_cuda.cu"
-int loadData(char *filename, std::vector< record> &records, std::vector< latLong> &locations) {
-# 177 "nn_cuda.cu"
-FILE *flist, *fp;
-# 178 "nn_cuda.cu"
 int i = 0;
-# 179 "nn_cuda.cu"
-char dbname[64];
-# 180 "nn_cuda.cu"
-int recNum = 0;
-# 184 "nn_cuda.cu"
-flist = fopen(filename, "r");
-# 185 "nn_cuda.cu"
-while (!(feof(flist))) {
-# 191 "nn_cuda.cu"
-if (fscanf(flist, "%s\n", dbname) != 1) {
-# 192 "nn_cuda.cu"
-fprintf(stderr, "error reading filelist\n");
-# 193 "nn_cuda.cu"
-exit(0);
-# 194 "nn_cuda.cu"
+# 68 "nn_cuda.cu"
+float lat, lng;
+# 69 "nn_cuda.cu"
+int quiet = 0, timing = 0, platform = 0, device = 0;
+# 71 "nn_cuda.cu"
+std::vector< record> records;
+# 72 "nn_cuda.cu"
+std::vector< latLong> locations;
+# 73 "nn_cuda.cu"
+char filename[100];
+# 74 "nn_cuda.cu"
+int resultsCount = 10;
+# 77 "nn_cuda.cu"
+if (parseCommandline(argc, argv, filename, &resultsCount, &lat, &lng, &quiet, &timing, &platform, &device))
+# 78 "nn_cuda.cu"
+{
+# 79 "nn_cuda.cu"
+printUsage();
+# 80 "nn_cuda.cu"
+return 0;
+# 81 "nn_cuda.cu"
 }
-# 195 "nn_cuda.cu"
-fp = fopen(dbname, "r");
-# 196 "nn_cuda.cu"
-if (!fp) {
-# 197 "nn_cuda.cu"
-printf("error opening a db\n");
-# 198 "nn_cuda.cu"
+# 83 "nn_cuda.cu"
+int numRecords = loadData(filename, records, locations);
+# 84 "nn_cuda.cu"
+if (resultsCount > numRecords) { resultsCount = numRecords; }
+# 91 "nn_cuda.cu"
+float *distances;
+# 93 "nn_cuda.cu"
+LatLong *d_locations;
+# 94 "nn_cuda.cu"
+float *d_distances;
+# 98 "nn_cuda.cu"
+cudaDeviceProp deviceProp;
+# 99 "nn_cuda.cu"
+cudaGetDeviceProperties(&deviceProp, 0);
+# 100 "nn_cuda.cu"
+cudaThreadSynchronize();
+# 101 "nn_cuda.cu"
+unsigned long maxGridX = (deviceProp.maxGridSize)[0];
+# 102 "nn_cuda.cu"
+unsigned long threadsPerBlock = ((deviceProp.maxThreadsPerBlock) > 256) ? 256 : (deviceProp.maxThreadsPerBlock);
+# 103 "nn_cuda.cu"
+size_t totalDeviceMemory;
+# 104 "nn_cuda.cu"
+size_t freeDeviceMemory;
+# 107 "nn_cuda.cu"
+freeDeviceMemory = ((512 * 1024) * 1024);
+# 108 "nn_cuda.cu"
+totalDeviceMemory = ((768 * 1024) * 1024);
+# 113 "nn_cuda.cu"
+cudaThreadSynchronize();
+# 114 "nn_cuda.cu"
+unsigned long usableDeviceMemory = (freeDeviceMemory * (85)) / (100);
+# 115 "nn_cuda.cu"
+unsigned long maxThreads = usableDeviceMemory / (12);
+# 116 "nn_cuda.cu"
+if (numRecords > maxThreads)
+# 117 "nn_cuda.cu"
+{
+# 118 "nn_cuda.cu"
+fprintf(stderr, "Error: Input too large.\n");
+# 119 "nn_cuda.cu"
 exit(1);
+# 120 "nn_cuda.cu"
+}
+# 121 "nn_cuda.cu"
+unsigned long blocks = ((numRecords + threadsPerBlock) - (1)) / threadsPerBlock;
+# 122 "nn_cuda.cu"
+unsigned long gridY = ((blocks + maxGridX) - (1)) / maxGridX;
+# 123 "nn_cuda.cu"
+unsigned long gridX = ((blocks + gridY) - (1)) / gridY;
+# 125 "nn_cuda.cu"
+dim3 gridDim(gridX, gridY);
+# 127 "nn_cuda.cu"
+if (false)
+# 128 "nn_cuda.cu"
+{
+# 129 "nn_cuda.cu"
+printf("totalDeviceMemory: %lu\n", (unsigned long)totalDeviceMemory);
+# 130 "nn_cuda.cu"
+printf("freeDeviceMemory: %lu\n", (unsigned long)freeDeviceMemory);
+# 131 "nn_cuda.cu"
+printf("usableDeviceMemory: %lu\n", (unsigned long)usableDeviceMemory);
+# 132 "nn_cuda.cu"
+printf("maxGridX: %lu\n", (unsigned long)maxGridX);
+# 133 "nn_cuda.cu"
+printf("deviceProp.maxThreadsPerBlock: %lu\n", (unsigned long)(deviceProp.maxThreadsPerBlock));
+# 134 "nn_cuda.cu"
+printf("threadsPerBlock: %lu\n", (unsigned long)threadsPerBlock);
+# 135 "nn_cuda.cu"
+printf("maxThreads: %lu\n", (unsigned long)maxThreads);
+# 136 "nn_cuda.cu"
+printf("blocks: %lu\n", (unsigned long)blocks);
+# 137 "nn_cuda.cu"
+printf("gridY: %lu\n", (unsigned long)gridY);
+# 138 "nn_cuda.cu"
+printf("gridX: %lu\n", (unsigned long)gridX);
+# 139 "nn_cuda.cu"
+}
+# 144 "nn_cuda.cu"
+distances = ((float *)malloc(sizeof(float) * numRecords));
+# 145 "nn_cuda.cu"
+cudaMalloc((void **)(&d_locations), sizeof(LatLong) * numRecords);
+# 146 "nn_cuda.cu"
+cudaMalloc((void **)(&d_distances), sizeof(float) * numRecords);
+# 151 "nn_cuda.cu"
+cudaMemcpy(d_locations, &locations[0], sizeof(LatLong) * numRecords, cudaMemcpyHostToDevice);
+# 157 "nn_cuda.cu"
+(__cudaPushCallConfiguration(1, 32)) ? (void)0 : euclid(d_locations, d_distances, numRecords, lat, lng);
+# 158 "nn_cuda.cu"
+cudaThreadSynchronize();
+# 161 "nn_cuda.cu"
+cudaMemcpy(distances, d_distances, sizeof(float) * numRecords, cudaMemcpyDeviceToHost);
+# 164 "nn_cuda.cu"
+findLowest(records, distances, numRecords, resultsCount);
+# 167 "nn_cuda.cu"
+if (!quiet) {
+# 168 "nn_cuda.cu"
+for (i = 0; i < resultsCount; i++) {
+# 169 "nn_cuda.cu"
+printf("%s --> Distance=%f\n", records[i].recString, records[i].distance);
+# 170 "nn_cuda.cu"
+} }
+# 171 "nn_cuda.cu"
+free(distances);
+# 173 "nn_cuda.cu"
+cudaFree(d_locations);
+# 174 "nn_cuda.cu"
+cudaFree(d_distances); return 0;
+# 176 "nn_cuda.cu"
+}
+# 178 "nn_cuda.cu"
+int loadData(char *filename, std::vector< record> &records, std::vector< latLong> &locations) {
+# 179 "nn_cuda.cu"
+FILE *flist, *fp;
+# 180 "nn_cuda.cu"
+int i = 0;
+# 181 "nn_cuda.cu"
+char dbname[64];
+# 182 "nn_cuda.cu"
+int recNum = 0;
+# 186 "nn_cuda.cu"
+flist = fopen(filename, "r");
+# 187 "nn_cuda.cu"
+while (!(feof(flist))) {
+# 193 "nn_cuda.cu"
+if (fscanf(flist, "%s\n", dbname) != 1) {
+# 194 "nn_cuda.cu"
+fprintf(stderr, "error reading filelist\n");
+# 195 "nn_cuda.cu"
+exit(0);
+# 196 "nn_cuda.cu"
+}
+# 197 "nn_cuda.cu"
+fp = fopen(dbname, "r");
+# 198 "nn_cuda.cu"
+if (!fp) {
 # 199 "nn_cuda.cu"
-}
+printf("error opening a db\n");
+# 200 "nn_cuda.cu"
+exit(1);
 # 201 "nn_cuda.cu"
-while (!(feof(fp))) {
-# 202 "nn_cuda.cu"
-Record record;
-# 203 "nn_cuda.cu"
-LatLong latLong;
-# 204 "nn_cuda.cu"
-fgets(record.recString, 49, fp);
-# 205 "nn_cuda.cu"
-fgetc(fp);
-# 206 "nn_cuda.cu"
-if (feof(fp)) { break; }
-# 209 "nn_cuda.cu"
-char substr[6];
-# 211 "nn_cuda.cu"
-for (i = 0; i < 5; i++) { (substr[i]) = (*(((record.recString) + i) + 28)); }
-# 212 "nn_cuda.cu"
-(substr[5]) = '\000';
-# 213 "nn_cuda.cu"
-(latLong.lat) = (atof(substr));
-# 215 "nn_cuda.cu"
-for (i = 0; i < 5; i++) { (substr[i]) = (*(((record.recString) + i) + 33)); }
-# 216 "nn_cuda.cu"
-(substr[5]) = '\000';
-# 217 "nn_cuda.cu"
-(latLong.lng) = (atof(substr));
-# 219 "nn_cuda.cu"
-locations.push_back(latLong);
-# 220 "nn_cuda.cu"
-records.push_back(record);
-# 221 "nn_cuda.cu"
-recNum++;
-# 222 "nn_cuda.cu"
 }
+# 203 "nn_cuda.cu"
+while (!(feof(fp))) {
+# 204 "nn_cuda.cu"
+Record record;
+# 205 "nn_cuda.cu"
+LatLong latLong;
+# 206 "nn_cuda.cu"
+fgets(record.recString, 49, fp);
+# 207 "nn_cuda.cu"
+fgetc(fp);
+# 208 "nn_cuda.cu"
+if (feof(fp)) { break; }
+# 211 "nn_cuda.cu"
+char substr[6];
+# 213 "nn_cuda.cu"
+for (i = 0; i < 5; i++) { (substr[i]) = (*(((record.recString) + i) + 28)); }
+# 214 "nn_cuda.cu"
+(substr[5]) = '\000';
+# 215 "nn_cuda.cu"
+(latLong.lat) = (atof(substr));
+# 217 "nn_cuda.cu"
+for (i = 0; i < 5; i++) { (substr[i]) = (*(((record.recString) + i) + 33)); }
+# 218 "nn_cuda.cu"
+(substr[5]) = '\000';
+# 219 "nn_cuda.cu"
+(latLong.lng) = (atof(substr));
+# 221 "nn_cuda.cu"
+locations.push_back(latLong);
+# 222 "nn_cuda.cu"
+records.push_back(record);
 # 223 "nn_cuda.cu"
-fclose(fp);
+recNum++;
 # 224 "nn_cuda.cu"
 }
 # 225 "nn_cuda.cu"
-fclose(flist);
+fclose(fp);
+# 226 "nn_cuda.cu"
+}
 # 227 "nn_cuda.cu"
+fclose(flist);
+# 229 "nn_cuda.cu"
 return recNum;
-# 228 "nn_cuda.cu"
-}
 # 230 "nn_cuda.cu"
-void findLowest(std::vector< record> &records, float *distances, int numRecords, int topN) {
-# 231 "nn_cuda.cu"
-int i, j;
+}
 # 232 "nn_cuda.cu"
-float val;
+void findLowest(std::vector< record> &records, float *distances, int numRecords, int topN) {
 # 233 "nn_cuda.cu"
-int minLoc;
+int i, j;
 # 234 "nn_cuda.cu"
-Record *tempRec;
+float val;
 # 235 "nn_cuda.cu"
-float tempDist;
+int minLoc;
+# 236 "nn_cuda.cu"
+Record *tempRec;
 # 237 "nn_cuda.cu"
-for (i = 0; i < topN; i++) {
-# 238 "nn_cuda.cu"
-minLoc = i;
+float tempDist;
 # 239 "nn_cuda.cu"
-for (j = i; j < numRecords; j++) {
+for (i = 0; i < topN; i++) {
 # 240 "nn_cuda.cu"
-val = (distances[j]);
+minLoc = i;
 # 241 "nn_cuda.cu"
-if (val < (distances[minLoc])) { minLoc = j; }
+for (j = i; j < numRecords; j++) {
 # 242 "nn_cuda.cu"
-}
+val = (distances[j]);
+# 243 "nn_cuda.cu"
+if (val < (distances[minLoc])) { minLoc = j; }
 # 244 "nn_cuda.cu"
-tempRec = (&records[i]);
-# 245 "nn_cuda.cu"
-records[i] = records[minLoc];
-# 246 "nn_cuda.cu"
-records[minLoc] = (*tempRec);
-# 248 "nn_cuda.cu"
-tempDist = (distances[i]);
-# 249 "nn_cuda.cu"
-(distances[i]) = (distances[minLoc]);
-# 250 "nn_cuda.cu"
-(distances[minLoc]) = tempDist;
-# 253 "nn_cuda.cu"
-(records[i].distance) = (distances[i]);
-# 254 "nn_cuda.cu"
 }
+# 246 "nn_cuda.cu"
+tempRec = (&records[i]);
+# 247 "nn_cuda.cu"
+records[i] = records[minLoc];
+# 248 "nn_cuda.cu"
+records[minLoc] = (*tempRec);
+# 250 "nn_cuda.cu"
+tempDist = (distances[i]);
+# 251 "nn_cuda.cu"
+(distances[i]) = (distances[minLoc]);
+# 252 "nn_cuda.cu"
+(distances[minLoc]) = tempDist;
 # 255 "nn_cuda.cu"
+(records[i].distance) = (distances[i]);
+# 256 "nn_cuda.cu"
 }
 # 257 "nn_cuda.cu"
-int parseCommandline(int argc, char *argv[], char *filename, int *r, float *lat, float *lng, int *
-# 258 "nn_cuda.cu"
-q, int *t, int *p, int *d) {
+}
 # 259 "nn_cuda.cu"
-int i;
+int parseCommandline(int argc, char *argv[], char *filename, int *r, float *lat, float *lng, int *
 # 260 "nn_cuda.cu"
-if (argc < 2) { return 1; }
+q, int *t, int *p, int *d) {
 # 261 "nn_cuda.cu"
-strncpy(filename, argv[1], 100);
+int i;
 # 262 "nn_cuda.cu"
-char flag;
+if (argc < 2) { return 1; }
+# 263 "nn_cuda.cu"
+strncpy(filename, argv[1], 100);
 # 264 "nn_cuda.cu"
-for (i = 1; i < argc; i++) {
-# 265 "nn_cuda.cu"
-if (((argv[i])[0]) == ('-')) {
+char flag;
 # 266 "nn_cuda.cu"
-flag = ((argv[i])[1]);
+for (i = 1; i < argc; i++) {
 # 267 "nn_cuda.cu"
-switch (flag) {
+if (((argv[i])[0]) == ('-')) {
 # 268 "nn_cuda.cu"
-case 'r':
+flag = ((argv[i])[1]);
 # 269 "nn_cuda.cu"
-i++;
+switch (flag) {
 # 270 "nn_cuda.cu"
-(*r) = atoi(argv[i]);
+case 'r':
 # 271 "nn_cuda.cu"
-break;
+i++;
 # 272 "nn_cuda.cu"
-case 'l':
+(*r) = atoi(argv[i]);
 # 273 "nn_cuda.cu"
-if (((argv[i])[2]) == ('a')) {
+break;
 # 274 "nn_cuda.cu"
-(*lat) = (atof(argv[i + 1]));
+case 'l':
 # 275 "nn_cuda.cu"
-} else
+if (((argv[i])[2]) == ('a')) {
 # 276 "nn_cuda.cu"
-{
+(*lat) = (atof(argv[i + 1]));
 # 277 "nn_cuda.cu"
-(*lng) = (atof(argv[i + 1]));
+} else
 # 278 "nn_cuda.cu"
-}
+{
 # 279 "nn_cuda.cu"
-i++;
+(*lng) = (atof(argv[i + 1]));
 # 280 "nn_cuda.cu"
-break;
+}
 # 281 "nn_cuda.cu"
-case 'h':
+i++;
 # 282 "nn_cuda.cu"
-return 1;
+break;
 # 283 "nn_cuda.cu"
-case 'q':
+case 'h':
 # 284 "nn_cuda.cu"
-(*q) = 1;
+return 1;
 # 285 "nn_cuda.cu"
-break;
+case 'q':
 # 286 "nn_cuda.cu"
-case 't':
+(*q) = 1;
 # 287 "nn_cuda.cu"
-(*t) = 1;
+break;
 # 288 "nn_cuda.cu"
-break;
+case 't':
 # 289 "nn_cuda.cu"
-case 'p':
+(*t) = 1;
 # 290 "nn_cuda.cu"
-i++;
+break;
 # 291 "nn_cuda.cu"
-(*p) = atoi(argv[i]);
+case 'p':
 # 292 "nn_cuda.cu"
-break;
-# 293 "nn_cuda.cu"
-case 'd':
-# 294 "nn_cuda.cu"
 i++;
-# 295 "nn_cuda.cu"
-(*d) = atoi(argv[i]);
-# 296 "nn_cuda.cu"
+# 293 "nn_cuda.cu"
+(*p) = atoi(argv[i]);
+# 294 "nn_cuda.cu"
 break;
+# 295 "nn_cuda.cu"
+case 'd':
+# 296 "nn_cuda.cu"
+i++;
 # 297 "nn_cuda.cu"
-}
+(*d) = atoi(argv[i]);
 # 298 "nn_cuda.cu"
-}
+break;
 # 299 "nn_cuda.cu"
 }
 # 300 "nn_cuda.cu"
-if ((((*d) >= 0) && ((*p) < 0)) || (((*p) >= 0) && ((*d) < 0))) {
-# 301 "nn_cuda.cu"
-return 1; }
-# 302 "nn_cuda.cu"
-return 0;
-# 303 "nn_cuda.cu"
 }
+# 301 "nn_cuda.cu"
+}
+# 302 "nn_cuda.cu"
+if ((((*d) >= 0) && ((*p) < 0)) || (((*p) >= 0) && ((*d) < 0))) {
+# 303 "nn_cuda.cu"
+return 1; }
+# 304 "nn_cuda.cu"
+return 0;
 # 305 "nn_cuda.cu"
-void printUsage() {
-# 306 "nn_cuda.cu"
-printf("Nearest Neighbor Usage\n");
+}
 # 307 "nn_cuda.cu"
-printf("\n");
+void printUsage() {
 # 308 "nn_cuda.cu"
-printf("nearestNeighbor [filename] -r [int] -lat [float] -lng [float] [-hqt] [-p [int] -d [int]]\n");
+printf("Nearest Neighbor Usage\n");
 # 309 "nn_cuda.cu"
 printf("\n");
 # 310 "nn_cuda.cu"
-printf("example:\n");
+printf("nearestNeighbor [filename] -r [int] -lat [float] -lng [float] [-hqt] [-p [int] -d [int]]\n");
 # 311 "nn_cuda.cu"
-printf("$ ./nearestNeighbor filelist.txt -r 5 -lat 30 -lng 90\n");
+printf("\n");
 # 312 "nn_cuda.cu"
-printf("\n");
+printf("example:\n");
 # 313 "nn_cuda.cu"
-printf("filename     the filename that lists the data input files\n");
+printf("$ ./nearestNeighbor filelist.txt -r 5 -lat 30 -lng 90\n");
 # 314 "nn_cuda.cu"
-printf("-r [int]     the number of records to return (default: 10)\n");
+printf("\n");
 # 315 "nn_cuda.cu"
-printf("-lat [float] the latitude for nearest neighbors (default: 0)\n");
+printf("filename     the filename that lists the data input files\n");
 # 316 "nn_cuda.cu"
-printf("-lng [float] the longitude for nearest neighbors (default: 0)\n");
+printf("-r [int]     the number of records to return (default: 10)\n");
 # 317 "nn_cuda.cu"
-printf("\n");
+printf("-lat [float] the latitude for nearest neighbors (default: 0)\n");
 # 318 "nn_cuda.cu"
-printf("-h, --help   Display the help file\n");
+printf("-lng [float] the longitude for nearest neighbors (default: 0)\n");
 # 319 "nn_cuda.cu"
-printf("-q           Quiet mode. Suppress all text output.\n");
+printf("\n");
 # 320 "nn_cuda.cu"
-printf("-t           Print timing information.\n");
+printf("-h, --help   Display the help file\n");
 # 321 "nn_cuda.cu"
-printf("\n");
+printf("-q           Quiet mode. Suppress all text output.\n");
 # 322 "nn_cuda.cu"
-printf("-p [int]     Choose the platform (must choose both platform and device)\n");
+printf("-t           Print timing information.\n");
 # 323 "nn_cuda.cu"
-printf("-d [int]     Choose the device (must choose both platform and device)\n");
+printf("\n");
 # 324 "nn_cuda.cu"
-printf("\n");
+printf("-p [int]     Choose the platform (must choose both platform and device)\n");
 # 325 "nn_cuda.cu"
-printf("\n");
+printf("-d [int]     Choose the device (must choose both platform and device)\n");
 # 326 "nn_cuda.cu"
-printf("Notes: 1. The filename is required as the first parameter.\n");
+printf("\n");
 # 327 "nn_cuda.cu"
-printf("       2. If you declare either the device or the platform,\n");
+printf("\n");
 # 328 "nn_cuda.cu"
-printf("          you must declare both.\n\n");
+printf("Notes: 1. The filename is required as the first parameter.\n");
 # 329 "nn_cuda.cu"
+printf("       2. If you declare either the device or the platform,\n");
+# 330 "nn_cuda.cu"
+printf("          you must declare both.\n\n");
+# 331 "nn_cuda.cu"
 }
-# 1 "tmpxft_0000130a_00000000-5_nn_cuda.compute_75.cudafe1.stub.c"
-# 1 "tmpxft_0000130a_00000000-5_nn_cuda.compute_75.cudafe1.stub.c"
-# 1 "/tmp/tmpxft_0000130a_00000000-5_nn_cuda.compute_75.cudafe1.stub.c" 1 3
+# 1 "tmpxft_000046de_00000000-5_nn_cuda.compute_75.cudafe1.stub.c"
+# 1 "tmpxft_000046de_00000000-5_nn_cuda.compute_75.cudafe1.stub.c"
+# 1 "/tmp/tmpxft_000046de_00000000-5_nn_cuda.compute_75.cudafe1.stub.c" 1 3
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-function"
 #pragma GCC diagnostic ignored "-Wcast-qual"
@@ -31002,8 +31002,8 @@ inline float erfcxf(float a)
 # 268 "/usr/local/cuda-11.0//bin/../targets/x86_64-linux/include/crt/host_runtime.h" 2 3
 
 #pragma pack()
-# 9 "/tmp/tmpxft_0000130a_00000000-5_nn_cuda.compute_75.cudafe1.stub.c" 2 3
-# 1 "/tmp/tmpxft_0000130a_00000000-2_nn_cuda.fatbin.c" 1 3
+# 9 "/tmp/tmpxft_000046de_00000000-5_nn_cuda.compute_75.cudafe1.stub.c" 2 3
+# 1 "/tmp/tmpxft_000046de_00000000-2_nn_cuda.fatbin.c" 1 3
 
 # 1 "/usr/local/cuda-11.0//bin/../targets/x86_64-linux/include/fatbinary_section.h" 1 3
 # 18 "/usr/local/cuda-11.0//bin/../targets/x86_64-linux/include/fatbinary_section.h" 3
@@ -31042,7 +31042,7 @@ typedef struct {
 } __fatBinC_Wrapper_t;
 # 60 "/usr/local/cuda-11.0//bin/../targets/x86_64-linux/include/fatbinary_section.h" 3
 }
-# 3 "/tmp/tmpxft_0000130a_00000000-2_nn_cuda.fatbin.c" 2 3
+# 3 "/tmp/tmpxft_000046de_00000000-2_nn_cuda.fatbin.c" 2 3
 
 
 
@@ -31551,7 +31551,7 @@ static const __fatBinC_Wrapper_t __fatDeviceText __attribute__ ((aligned (8))) _
  { 0x466243b1, 1, fatbinData, 0 };
 
 }
-# 10 "/tmp/tmpxft_0000130a_00000000-5_nn_cuda.compute_75.cudafe1.stub.c" 2 3
+# 10 "/tmp/tmpxft_000046de_00000000-5_nn_cuda.compute_75.cudafe1.stub.c" 2 3
 extern void __device_stub__Z6euclidP7latLongPfiff(LatLong *, float *, int, float, float);
 static void __nv_cudaEntityRegisterCallback(void **);
 static void __sti____cudaRegisterAll(void) __attribute__((__constructor__));
@@ -31564,46 +31564,46 @@ void euclid( LatLong *__cuda_0,float *__cuda_1,int __cuda_2,float __cuda_3,float
 {__device_stub__Z6euclidP7latLongPfiff( __cuda_0,__cuda_1,__cuda_2,__cuda_3,__cuda_4);
 # 58 "nn_cuda.cu"
 }
-# 1 "/tmp/tmpxft_0000130a_00000000-5_nn_cuda.compute_75.cudafe1.stub.c"
+# 1 "/tmp/tmpxft_000046de_00000000-5_nn_cuda.compute_75.cudafe1.stub.c"
 static void __nv_cudaEntityRegisterCallback( void **__T3) { 
-# 1 "/tmp/tmpxft_0000130a_00000000-5_nn_cuda.compute_75.cudafe1.stub.c" 3
+# 1 "/tmp/tmpxft_000046de_00000000-5_nn_cuda.compute_75.cudafe1.stub.c" 3
                                                             { volatile static void **__ref __attribute__((unused)); __ref = (volatile void **)
-# 1 "/tmp/tmpxft_0000130a_00000000-5_nn_cuda.compute_75.cudafe1.stub.c"
+# 1 "/tmp/tmpxft_000046de_00000000-5_nn_cuda.compute_75.cudafe1.stub.c"
                                                             __T3
-# 1 "/tmp/tmpxft_0000130a_00000000-5_nn_cuda.compute_75.cudafe1.stub.c" 3
+# 1 "/tmp/tmpxft_000046de_00000000-5_nn_cuda.compute_75.cudafe1.stub.c" 3
                                                             ; }
-# 1 "/tmp/tmpxft_0000130a_00000000-5_nn_cuda.compute_75.cudafe1.stub.c"
+# 1 "/tmp/tmpxft_000046de_00000000-5_nn_cuda.compute_75.cudafe1.stub.c"
                                                                                       ; __nv_save_fatbinhandle_for_managed_rt(__T3); 
-# 1 "/tmp/tmpxft_0000130a_00000000-5_nn_cuda.compute_75.cudafe1.stub.c" 3
+# 1 "/tmp/tmpxft_000046de_00000000-5_nn_cuda.compute_75.cudafe1.stub.c" 3
                                                                                                                                      __cudaRegisterFunction(
-# 1 "/tmp/tmpxft_0000130a_00000000-5_nn_cuda.compute_75.cudafe1.stub.c"
+# 1 "/tmp/tmpxft_000046de_00000000-5_nn_cuda.compute_75.cudafe1.stub.c"
                                                                                                                                      __T3
-# 1 "/tmp/tmpxft_0000130a_00000000-5_nn_cuda.compute_75.cudafe1.stub.c" 3
+# 1 "/tmp/tmpxft_000046de_00000000-5_nn_cuda.compute_75.cudafe1.stub.c" 3
                                                                                                                                      , (const char*)
-# 1 "/tmp/tmpxft_0000130a_00000000-5_nn_cuda.compute_75.cudafe1.stub.c"
+# 1 "/tmp/tmpxft_000046de_00000000-5_nn_cuda.compute_75.cudafe1.stub.c"
                                                                                                                                      ((void ( *)(LatLong *, float *, int, float, float))euclid)
-# 1 "/tmp/tmpxft_0000130a_00000000-5_nn_cuda.compute_75.cudafe1.stub.c" 3
+# 1 "/tmp/tmpxft_000046de_00000000-5_nn_cuda.compute_75.cudafe1.stub.c" 3
                                                                                                                                      , (char*)
-# 1 "/tmp/tmpxft_0000130a_00000000-5_nn_cuda.compute_75.cudafe1.stub.c"
+# 1 "/tmp/tmpxft_000046de_00000000-5_nn_cuda.compute_75.cudafe1.stub.c"
                                                                                                                                      "_Z6euclidP7latLongPfiff"
-# 1 "/tmp/tmpxft_0000130a_00000000-5_nn_cuda.compute_75.cudafe1.stub.c" 3
+# 1 "/tmp/tmpxft_000046de_00000000-5_nn_cuda.compute_75.cudafe1.stub.c" 3
                                                                                                                                      , 
-# 1 "/tmp/tmpxft_0000130a_00000000-5_nn_cuda.compute_75.cudafe1.stub.c"
+# 1 "/tmp/tmpxft_000046de_00000000-5_nn_cuda.compute_75.cudafe1.stub.c"
                                                                                                                                      "_Z6euclidP7latLongPfiff"
-# 1 "/tmp/tmpxft_0000130a_00000000-5_nn_cuda.compute_75.cudafe1.stub.c" 3
+# 1 "/tmp/tmpxft_000046de_00000000-5_nn_cuda.compute_75.cudafe1.stub.c" 3
                                                                                                                                      , -1, (uint3*)0, (uint3*)0, (dim3*)0, (dim3*)0, (int*)0)
-# 1 "/tmp/tmpxft_0000130a_00000000-5_nn_cuda.compute_75.cudafe1.stub.c"
+# 1 "/tmp/tmpxft_000046de_00000000-5_nn_cuda.compute_75.cudafe1.stub.c"
                                                                                                                                                                                                                                                          ; }
 static void __sti____cudaRegisterAll(void) { 
-# 2 "/tmp/tmpxft_0000130a_00000000-5_nn_cuda.compute_75.cudafe1.stub.c" 3
+# 2 "/tmp/tmpxft_000046de_00000000-5_nn_cuda.compute_75.cudafe1.stub.c" 3
                                              __cudaFatCubinHandle = __cudaRegisterFatBinary((void*)&__fatDeviceText); { void (*callback_fp)(void **) = (void (*)(void **))(
-# 2 "/tmp/tmpxft_0000130a_00000000-5_nn_cuda.compute_75.cudafe1.stub.c"
+# 2 "/tmp/tmpxft_000046de_00000000-5_nn_cuda.compute_75.cudafe1.stub.c"
                                              __nv_cudaEntityRegisterCallback
-# 2 "/tmp/tmpxft_0000130a_00000000-5_nn_cuda.compute_75.cudafe1.stub.c" 3
+# 2 "/tmp/tmpxft_000046de_00000000-5_nn_cuda.compute_75.cudafe1.stub.c" 3
                                              ); (*callback_fp)(__cudaFatCubinHandle); __cudaRegisterFatBinaryEnd(__cudaFatCubinHandle); } atexit(__cudaUnregisterBinaryUtil)
-# 2 "/tmp/tmpxft_0000130a_00000000-5_nn_cuda.compute_75.cudafe1.stub.c"
+# 2 "/tmp/tmpxft_000046de_00000000-5_nn_cuda.compute_75.cudafe1.stub.c"
                                                                                                   ; }
 
 #pragma GCC diagnostic pop
-# 2 "tmpxft_0000130a_00000000-5_nn_cuda.compute_75.cudafe1.stub.c" 2
-# 1 "tmpxft_0000130a_00000000-5_nn_cuda.compute_75.cudafe1.stub.c"
+# 2 "tmpxft_000046de_00000000-5_nn_cuda.compute_75.cudafe1.stub.c" 2
+# 1 "tmpxft_000046de_00000000-5_nn_cuda.compute_75.cudafe1.stub.c"
