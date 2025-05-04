@@ -43,21 +43,9 @@ rodinia_2.0-ft:
 ###################################################################################################3
 # ECRTS_2025 Paper experiments. 
 ###################################################################################################3
-sgemm_4w:
-	$(SETENV) make $(MAKE_ARGS) -C cuda/sgemm_4w/sgemm
-	$(SETENV) make $(MAKE_ARGS) -C cuda/sgemm_4w/sgemm_double_buff
-
-sgemm_8w:
-	$(SETENV) make $(MAKE_ARGS) -C cuda/sgemm_8w/sgemm
-	$(SETENV) make $(MAKE_ARGS) -C cuda/sgemm_8w/sgemm_double_buff
-
-sgemm_16w:
-	$(SETENV) make $(MAKE_ARGS) -C cuda/sgemm_16w/sgemm
-	$(SETENV) make $(MAKE_ARGS) -C cuda/sgemm_16w/sgemm_double_buff
-
-sgemm_32w:
-	$(SETENV) make $(MAKE_ARGS) -C cuda/sgemm_32w/sgemm
-	$(SETENV) make $(MAKE_ARGS) -C cuda/sgemm_32w/sgemm_double_buff
+ecrts_2025:
+	$(SETENV) make $(MAKE_ARGS) -C cuda/ecrts_2025/sgemm
+	$(SETENV) make $(MAKE_ARGS) -C cuda/ecrts_2025/sgemm_double_buff
 
 
 ###################################################################################################3
@@ -201,63 +189,6 @@ rodinia-3.1:
 	mv $(BINDIR)/$(BINSUBDIR)/needle $(BINDIR)/$(BINSUBDIR)/nw-rodinia-3.1
 	mv $(BINDIR)/$(BINSUBDIR)/streamcluster $(BINDIR)/$(BINSUBDIR)/streamcluster-rodinia-3.1
 	mv $(BINDIR)/mummergpu $(BINDIR)/$(BINSUBDIR)/mummergpu-rodinia-3.1
-
-rodinia-3.1_1w:
-	if [ ${CUDA_VERSION_MAJOR} -gt 5 ]; then \
-		$(SETENV) make $(MAKE_ARGS) noinline=$(noinline) -C cuda/rodinia_1w/3.1/cuda/huffman/; \
-	fi
-	$(SETENV) make $(MAKE_ARGS) noinline=$(noinline) -C cuda/rodinia_1w/3.1/cuda/backprop -f Makefile_nvidia
-	$(SETENV) make $(MAKE_ARGS) noinline=$(noinline) -C cuda/rodinia_1w/3.1/cuda/bfs -f Makefile_nvidia
-	$(SETENV) make $(MAKE_ARGS) noinline=$(noinline) -C cuda/rodinia_1w/3.1/cuda/cfd -f Makefile_nvidia
-	$(SETENV) make $(MAKE_ARGS) noinline=$(noinline) -C cuda/rodinia_1w/3.1/cuda/hotspot -f Makefile_nvidia
-	$(SETENV) make $(MAKE_ARGS) noinline=$(noinline) -C cuda/rodinia_1w/3.1/cuda/kmeans -f Makefile_nvidia
-	$(SETENV) make $(MAKE_ARGS) noinline=$(noinline) -C cuda/rodinia_1w/3.1/cuda/nw -f Makefile_nvidia
-	$(SETENV) make $(MAKE_ARGS) noinline=$(noinline) -C cuda/rodinia_1w/3.1/cuda/streamcluster -f Makefile_nvidia
-	$(SETENV) make $(MAKE_ARGS) noinline=$(noinline) -C cuda/rodinia_1w/3.1/cuda/mummergpu
-	$(SETENV) make $(MAKE_ARGS) noinline=$(noinline) -C cuda/rodinia_1w/3.1/cuda/b+tree/
-	$(SETENV) make $(MAKE_ARGS) noinline=$(noinline) -C cuda/rodinia_1w/3.1/cuda/dwt2d/
-	$(SETENV) make $(MAKE_ARGS) noinline=$(noinline) -C cuda/rodinia_1w/3.1/cuda/heartwall/
-	$(SETENV) make $(MAKE_ARGS) noinline=$(noinline) -C cuda/rodinia_1w/3.1/cuda/hybridsort/
-	$(SETENV) make $(MAKE_ARGS) noinline=$(noinline) -C cuda/rodinia_1w/3.1/cuda/myocyte/
-	$(SETENV) make $(MAKE_ARGS) noinline=$(noinline) -C cuda/rodinia_1w/3.1/cuda/nn/
-	$(SETENV) make $(MAKE_ARGS) noinline=$(noinline) -C cuda/rodinia_1w/3.1/cuda/particlefilter/
-	$(SETENV) make $(MAKE_ARGS) noinline=$(noinline) -C cuda/rodinia_1w/3.1/cuda/particlefilter/
-	$(SETENV) make $(MAKE_ARGS) noinline=$(noinline) -C cuda/rodinia_1w/3.1/cuda/pathfinder/
-	$(SETENV) make $(MAKE_ARGS) noinline=$(noinline) -C cuda/rodinia_1w/3.1/cuda/lavaMD/
-	$(SETENV) make $(MAKE_ARGS) noinline=$(noinline) -C cuda/rodinia_1w/3.1/cuda/lud/cuda/
-#	$(SETENV) make $(MAKE_ARGS) noinline=$(noinline) -C cuda/rodinia_1w/3.1/cuda/leukocyte/CUDA/
-	$(SETENV) make $(MAKE_ARGS) noinline=$(noinline) -C cuda/rodinia_1w/3.1/cuda/hotspot3D/
-	$(SETENV) make $(MAKE_ARGS) noinline=$(noinline) -C cuda/rodinia_1w/3.1/cuda/gaussian
-	$(SETENV) make $(MAKE_ARGS) noinline=$(noinline) -C cuda/rodinia_1w/3.1/cuda/srad/srad_v1
-	$(SETENV) make $(MAKE_ARGS) noinline=$(noinline) -C cuda/rodinia_1w/3.1/cuda/srad/srad_v2 -f Makefile_nvidia
-	if [ ${CUDA_VERSION_MAJOR} -gt 5 ]; then \
-		mv cuda/rodinia_1w/3.1/cuda/huffman/pavle $(BINDIR)/$(BINSUBDIR)/huffman-rodinia-3.1_1w; \
-	fi
-	mv cuda/rodinia_1w/3.1/cuda/b+tree/b+tree.out $(BINDIR)/$(BINSUBDIR)/b+tree-rodinia-3.1_1w
-	mv cuda/rodinia_1w/3.1/cuda/dwt2d/dwt2d $(BINDIR)/$(BINSUBDIR)/dwt2d-rodinia-3.1_1w
-	mv cuda/rodinia_1w/3.1/cuda/heartwall/heartwall $(BINDIR)/$(BINSUBDIR)/heartwall-rodinia-3.1_1w
-	mv cuda/rodinia_1w/3.1/cuda/hybridsort/hybridsort $(BINDIR)/$(BINSUBDIR)/hybridsort-rodinia-3.1_1w
-	mv cuda/rodinia_1w/3.1/cuda/myocyte/myocyte.out $(BINDIR)/$(BINSUBDIR)/myocyte-rodinia-3.1_1w
-	mv cuda/rodinia_1w/3.1/cuda/nn/nn $(BINDIR)/$(BINSUBDIR)/nn-rodinia-3.1_1w
-	mv cuda/rodinia_1w/3.1/cuda/particlefilter/particlefilter_float $(BINDIR)/$(BINSUBDIR)/particlefilter_float-rodinia-3.1_1w
-	mv cuda/rodinia_1w/3.1/cuda/particlefilter/particlefilter_naive $(BINDIR)/$(BINSUBDIR)/particlefilter_naive-rodinia-3.1_1w
-	mv cuda/rodinia_1w/3.1/cuda/pathfinder/pathfinder $(BINDIR)/$(BINSUBDIR)/pathfinder-rodinia-3.1_1w
-	mv cuda/rodinia_1w/3.1/cuda/lavaMD/lavaMD $(BINDIR)/$(BINSUBDIR)/lavaMD-rodinia-3.1_1w
-	mv cuda/rodinia_1w/3.1/cuda/lud/cuda/lud_cuda $(BINDIR)/$(BINSUBDIR)/lud-rodinia-3.1_1w
-#	mv cuda/rodinia_1w/3.1/cuda/leukocyte/CUDA/leukocyte $(BINDIR)/$(BINSUBDIR)/leukocyte-rodinia-3.1_1w
-	mv cuda/rodinia_1w/3.1/cuda/hotspot3D/3D $(BINDIR)/$(BINSUBDIR)/hotspot3D-rodinia-3.1_1w
-	mv cuda/rodinia_1w/3.1/cuda/gaussian/gaussian $(BINDIR)/$(BINSUBDIR)/gaussian-rodinia-3.1_1w
-	mv cuda/rodinia_1w/3.1/cuda/srad/srad_v1/srad $(BINDIR)/$(BINSUBDIR)/srad_v1-rodinia-3.1_1w
-	mv $(BINDIR)/$(BINSUBDIR)/srad_v2 $(BINDIR)/$(BINSUBDIR)/srad_v2-rodinia-3.1_1w
-	mv $(BINDIR)/$(BINSUBDIR)/backprop $(BINDIR)/$(BINSUBDIR)/backprop-rodinia-3.1_1w
-	mv $(BINDIR)/$(BINSUBDIR)/bfs  $(BINDIR)/$(BINSUBDIR)/bfs-rodinia-3.1_1w
-	mv $(BINDIR)/$(BINSUBDIR)/euler3d $(BINDIR)/$(BINSUBDIR)/cfd-rodinia-3.1_1w
-	mv $(BINDIR)/$(BINSUBDIR)/hotspot $(BINDIR)/$(BINSUBDIR)/hotspot-rodinia-3.1_1w
-	mv $(BINDIR)/$(BINSUBDIR)/kmeans $(BINDIR)/$(BINSUBDIR)/kmeans-rodinia-3.1_1w
-	mv $(BINDIR)/$(BINSUBDIR)/needle $(BINDIR)/$(BINSUBDIR)/nw-rodinia-3.1_1w
-	mv $(BINDIR)/$(BINSUBDIR)/streamcluster $(BINDIR)/$(BINSUBDIR)/streamcluster-rodinia-3.1_1w
-	mv $(BINDIR)/mummergpu $(BINDIR)/$(BINSUBDIR)/mummergpu-rodinia-3.1_1w
-
 
 ispass-2009:
 	$(SETENV) make $(MAKE_ARGS) noinline=$(noinline) -C cuda/ispass-2009/AES
