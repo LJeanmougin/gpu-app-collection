@@ -23,7 +23,6 @@ clean_data:
 data:
 	mkdir -p $(BINDIR)/$(BINSUBDIR)/
 	cd ../ && bash ./get_data.sh
-	mdir here
 
 ###################################################################################################3
 # Rodinia 2.0 Functional Test Stuff
