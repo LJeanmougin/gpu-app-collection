@@ -653,7 +653,7 @@ __global__ void kernel(){
 		//==================================================
 		//	VERTICAL CUMULATIVE SUM
 		//==================================================
-
+		// L.JEANMOUGIN : STOPPED HERE
 		//work
 		ei_new = tx;
 		while(ei_new < d_common.in2_pad_cumv_cols){

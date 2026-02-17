@@ -728,13 +728,13 @@ void particleFilter(unsigned char * I, int IszX, int IszY, int Nfr, int * seed, 
 
     for (k = 1; k < Nfr; k++) {
         
-        likelihood_kernel << < num_blocks, threads_per_block >> > (arrayX_GPU, arrayY_GPU, xj_GPU, yj_GPU, CDF_GPU, ind_GPU, objxy_GPU, likelihood_GPU, I_GPU, u_GPU, weights_GPU, Nparticles, countOnes, max_size, k, IszY, Nfr, seed_GPU, partial_sums);
+        likelihood_kernel << < 1, threads_per_block >> > (arrayX_GPU, arrayY_GPU, xj_GPU, yj_GPU, CDF_GPU, ind_GPU, objxy_GPU, likelihood_GPU, I_GPU, u_GPU, weights_GPU, Nparticles, countOnes, max_size, k, IszY, Nfr, seed_GPU, partial_sums);
 
-        sum_kernel << < num_blocks, threads_per_block >> > (partial_sums, Nparticles);
+        sum_kernel << < 1, threads_per_block >> > (partial_sums, Nparticles);
 
-        normalize_weights_kernel << < num_blocks, threads_per_block >> > (weights_GPU, Nparticles, partial_sums, CDF_GPU, u_GPU, seed_GPU);
+        normalize_weights_kernel << < 1, threads_per_block >> > (weights_GPU, Nparticles, partial_sums, CDF_GPU, u_GPU, seed_GPU);
         
-        find_index_kernel << < num_blocks, threads_per_block >> > (arrayX_GPU, arrayY_GPU, CDF_GPU, u_GPU, xj_GPU, yj_GPU, weights_GPU, Nparticles);
+        find_index_kernel << < 1, threads_per_block >> > (arrayX_GPU, arrayY_GPU, CDF_GPU, u_GPU, xj_GPU, yj_GPU, weights_GPU, Nparticles);
 
     }//end loop
 
