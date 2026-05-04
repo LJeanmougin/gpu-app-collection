@@ -182,7 +182,7 @@ void BFSGraph( int argc, char** argv)
 	printf("Start traversing the tree\n");
 	bool stop;
 	//Call the Kernel untill all the elements of Frontier are not false
-	do
+	for(int testing_calls = 0; testing_calls < 20; testing_calls++)
 	{
 		//if no thread changes this value then the loop stops
 		stop=false;
@@ -199,10 +199,10 @@ void BFSGraph( int argc, char** argv)
 
 		cudaMemcpy( &stop, d_over, sizeof(bool), cudaMemcpyDeviceToHost) ;
 		k++;
-		break; // L.Jeanmougin
+		if(stop)
+			break;
 	}
-	while(stop);
-
+	
 
 	printf("Kernel Executed %d times\n",k);
 
