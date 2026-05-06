@@ -84,40 +84,54 @@ void generate_matrix(float *mat, int size)
     }
 }
 
+void sgemm(float **hC, int warp_count)
+{
+  float *dA, *dB, *dC;
+  int M, N, K;
+  M = warp_count;
+  N = warp_count;
+  K = LINE_SIZE;
+  float *hA = (float *) malloc (M * K * sizeof(float));
+  float *hB = (float *) malloc (N * K * sizeof(float));
+  *hC = (float *) malloc (M * N * sizeof(float));
+
+  dim3 gridDim(1, 1, 1);
+  dim3 blockDim(32, warp_count, 1);
+
+  generate_matrix(hA, M * K);
+  generate_matrix(hB, N * K);
+  generate_matrix(*hC, M * N);
+
+  cudaMalloc((void **)&dA, sizeof(float) * M * K);
+  cudaMalloc((void **)&dB, sizeof(float) * N * K);
+  cudaMalloc((void **)&dC, sizeof(float) * M * N);
+
+  cudaMemcpy(dA, hA, sizeof(float) * M * K, cudaMemcpyHostToDevice);
+  cudaMemcpy(dB, hB, sizeof(float) * N * K, cudaMemcpyHostToDevice);
+  cudaMemcpy(dC, *hC, sizeof(float) * M * N, cudaMemcpyHostToDevice);
+
+  sgemm_shmem<<< gridDim, blockDim >>>(M, N, K, 0.5f, dA, dB, 0.5f, dC);
+
+  cudaMemcpy(*hC, dC, sizeof(float) * M * N, cudaMemcpyDeviceToHost);
+
+  cudaFree(dA);
+  cudaFree(dB);
+  cudaFree(dC);
+
+  free(hA);
+  free(hB);
+}
+
 int main()
 {
-    float *dA, *dB, *dC;
-    int M, N, K;
-    M = WARP_COUNT;
-    N = WARP_COUNT;
-    K = LINE_SIZE;
-    float hA[M * K];
-    float hB[N * K];
-    float hC[M * N];
-    
-
-    dim3 gridDim(1, 1, 1);
-    dim3 blockDim( 32, WARP_COUNT, 1);
-    
-    generate_matrix(hA, M * K);
-    generate_matrix(hB, N * K);
-    generate_matrix(hC, M * N);
-    
-    cudaMalloc((void **)&dA, sizeof(float) * M * K);
-    cudaMalloc((void **)&dB, sizeof(float) * K * N);
-    cudaMalloc((void **)&dC, sizeof(float) * M * N);
-
-    cudaMemcpy(dA, hA, sizeof(float) * M * K, cudaMemcpyHostToDevice);
-    cudaMemcpy(dB, hB, sizeof(float) * K * N, cudaMemcpyHostToDevice);
-    cudaMemcpy(dC, hC, sizeof(float) * M * N, cudaMemcpyHostToDevice);
-
-    sgemm_shmem<<< gridDim, blockDim >>>(M, N, K,0.5f, dA, dB, 0.5f, dC);
-
-    cudaMemcpy(hC, dC, sizeof(float) * M * N, cudaMemcpyDeviceToHost);
-
-    cudaFree(dA);
-    cudaFree(dB);
-    cudaFree(dC);
-
+    float *hC;
+    sgemm(&hC, 4);
+    free(hC);
+    sgemm(&hC, 8);
+    free(hC);
+    sgemm(&hC, 16);
+    free(hC);
+    sgemm(&hC, 32);
+    free(hC);
     return 0;
 }
