@@ -40,8 +40,16 @@ rodinia_2.0-ft:
 	$(SETENV) make $(MAKE_ARGS) -C cuda/rodinia/2.0-ft/srad
 	$(SETENV) make $(MAKE_ARGS) -C cuda/rodinia/2.0-ft/streamcluster
 
+
+
 ###################################################################################################3
-# ECRTS_2025 Paper experiments. 
+# Kalman experiments. 
+###################################################################################################3
+kalman:
+	$(SETENV) make $(MAKE_ARGS) -C cuda/kalman/CUDAkalmanFilter
+
+###################################################################################################3
+# SGEMM experiments. 
 ###################################################################################################3
 sgemm:
 	$(SETENV) make $(MAKE_ARGS) -C cuda/sgemm/sgemm

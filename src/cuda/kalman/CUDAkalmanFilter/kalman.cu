@@ -245,13 +245,13 @@ int blocksPerGridNo2 = (No2 + threadsPerBlock - 1) / threadsPerBlock;
 	
 //step 1  to calculate Y = Z - HX
 MatMult<<<blocksPerGridNos, threadsPerBlock>>>(d_Y, d_H, d_X, no, ns);
-MatSub<<<blocksPerGridNo, threadsPerBlock>>>(d_Y, d_Z, d_Y, no, 1);
+MatSub<<<1, 32>>>(d_Y, d_Z, d_Y, no, 1);
 	
 //step 2 to calculate  S = HPHt + E
 	
 MatMult<<<blocksPerGridNos, threadsPerBlock>>>(d_Hint, d_H, d_P, no, ns);
 MatMult<<<blocksPerGridNos, threadsPerBlock>>>(d_Sint, d_Hint, d_Ht, no, ns);
-MatAdd<<<blocksPerGridNo2, threadsPerBlock>>>(d_S, d_Sint, d_E, no, no);
+MatAdd<<<1, 32>>>(d_S, d_Sint, d_E, no, no);
 	
 //step 3 to calcualte K = PHtSi 
 	
@@ -262,14 +262,14 @@ MatMult<<<blocksPerGridNos, threadsPerBlock>>>(d_K, d_Kint, d_Si, ns, no);
 //step4 to calculate  X = X+ KY
 
 MatMult<<<blocksPerGridNos, threadsPerBlock>>>(d_Xint, d_K, d_Y, ns, no);
-MatAdd<<<blocksPerGridNs, threadsPerBlock>>>(d_X, d_X, d_Xint, ns, 1);
+MatAdd<<<1, 32>>>(d_X, d_X, d_Xint, ns, 1);
 	
 //step5 to calculate [I - KH]P
 	
 MatMult<<<blocksPerGridNos, threadsPerBlock>>>(d_Pint, d_K, d_H, ns, no);
-MatSub<<<blocksPerGridNs2, threadsPerBlock>>>(d_Pint, d_I, d_Pint, ns, ns);
+MatSub<<<1, 32>>>(d_Pint, d_I, d_Pint, ns, ns);
 MatMult<<<blocksPerGridNs2, threadsPerBlock>>>(d_Pint2, d_Pint, d_P, ns, ns);
-MatCopy<<<blocksPerGridNs2, threadsPerBlock>>>(d_P, d_Pint2, ns, ns);
+MatCopy<<<1, 32>>>(d_P, d_Pint2, ns, ns);
 	
 //Prediction Phase
 // X = FX
@@ -277,7 +277,7 @@ MatCopy<<<blocksPerGridNs2, threadsPerBlock>>>(d_P, d_Pint2, ns, ns);
 	
 //step 1 to calculate X = FX
 MatMult<<<blocksPerGridNs2, threadsPerBlock>>>(d_Xint, d_F, d_X, ns, ns);
-MatCopy<<<blocksPerGridNs, threadsPerBlock>>>(d_X, d_Xint, ns, 1);
+MatCopy<<<1, 32>>>(d_X, d_Xint, ns, 1);
 	
 //step2 to calculate P = FPFt 
 	
